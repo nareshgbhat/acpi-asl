@@ -1,0 +1,34 @@
+#
+# Each line is either a comment, white space, or two fields:
+#
+#    <signature> : <ASL file name>
+#
+# NB: for each file x.asl, an AML file called x.aml will be created
+#
+
+rsdp: rsdp.asl
+xsdt: xsdt.asl
+facp: facp.asl
+dsdt: dsdt.asl
+ssdt: ssdt0.asl
+bert: bert.asl
+ecdt: ecdt.asl
+facs: facs.asl
+gtdt: gtdt.asl
+hest: hest.asl
+apic: apic.asl
+mcfg: mcfg.asl
+mpst: mpst.asl
+oem:  oem0.asl
+pmmt: pmmt.asl
+slit: slit.asl
+spmi: spmi.asl
+srat: srat.asl
+uefi: uefi.asl
+cpep: cpep.asl
+einj: einj.asl
+erst: erst.asl
+fpdt: fpdt.asl
+mchi: mchi.asl
+msct: msct.asl
+
