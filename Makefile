@@ -2,7 +2,7 @@ MABDIR := tools/mab/
 PLATDIR := platforms/
 
 %.acpi : $(MABDIR)/mab
-	make MAB=$(CURDIR)/$(MABDIR)/mab -C $(PLATDIR) $@
+	make MAB=$(CURDIR)/$(MABDIR)/mab PADDR=$(PADDR) -C $(PLATDIR) $@
 
 $(MABDIR)/mab : FORCE
 	make -C $(MABDIR)
