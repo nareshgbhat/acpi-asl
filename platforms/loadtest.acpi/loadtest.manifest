@@ -1,0 +1,13 @@
+#
+# Each line is either a comment, white space, or two fields:
+#
+#    <signature> : <ASL file name>
+#
+# NB: for each file x.asl, an AML file called x.aml will be created
+#
+
+rsdp: rsdp.asl
+xsdt: xsdt.asl
+facp: facp.asl
+facs: facs.asl
+dsdt: dsdt.asl
