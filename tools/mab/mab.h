@@ -85,8 +85,8 @@ void write_table(unsigned char *blob, struct table *tp, int offset);
 void usage(void);
 int valid_sig(char *sig);
 
-void fixup_facp(unsigned char *blob, int *offset);
-void fixup_rsdp(unsigned char *blob);
-void fixup_xsdt(unsigned char *blob, int *offset);
+void fixup_facp(unsigned char *blob, int *offset, unsigned long paddr);
+void fixup_rsdp(unsigned char *blob, unsigned long paddr);
+void fixup_xsdt(unsigned char *blob, int *offset, unsigned long paddr);
 
 #endif

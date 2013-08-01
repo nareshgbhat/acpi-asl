@@ -38,6 +38,7 @@ void usage(void)
 	printf("   -o <blob>     => file name for resulting ACPI blob\n");
 	printf("   -i <manifest> => list of AML files needed\n");
 	printf("   -c <iasl-cmd> => iasl command to use (default: iasl -l)\n");
+	printf("   -p <paddr>    => physical address to relocate to.\n");
 	printf("   -q            => if given, supress output\n");
 }
 
@@ -251,7 +252,7 @@ int add_table(unsigned char *blob, char *table_name, int offset, int reqd)
 	return p->file_size;
 }
 
-void fixup_rsdp(unsigned char *blob)
+void fixup_rsdp(unsigned char *blob, uint64_t paddr)
 {
 	/* We could use the 32-bit RSDT address but that has
 	 * essentially been deprecated.  Instead, use the 64-bit
@@ -259,10 +260,12 @@ void fixup_rsdp(unsigned char *blob)
 	 */
 	const int RSDP_CHECKSUM_BYTES = 20;
 	const int RSDP_CHECKSUM_OFFSET = 8;
+	const int RSDT_ADDR_OFFSET = 16;
 	const int XSDT_ADDR_OFFSET = 24;
 
 	uint8_t  *pcksum;
-	uint64_t *tmp;
+	uint32_t *stmp;
+	uint64_t *ltmp;
 	struct table *rsdpp;
 	struct table *p;
 
@@ -272,14 +275,22 @@ void fixup_rsdp(unsigned char *blob)
 	 * seriously wrong far earlier.
 	 */
 	rsdpp = find_table("rsdp");
-	tmp = (uint64_t *)(blob + BLOB_HEADER_SIZE +
+	stmp = (uint32_t *)(blob + BLOB_HEADER_SIZE +
+			rsdpp->offset + RSDT_ADDR_OFFSET);
+	ltmp = (uint64_t *)(blob + BLOB_HEADER_SIZE +
 			rsdpp->offset + XSDT_ADDR_OFFSET);
 
 	p = find_table("xsdt");
 	if (p)
-		*tmp = p->offset;
+		*ltmp = p->offset + paddr;
 	else
-		*tmp = (uint64_t)0;
+		*ltmp = (uint64_t)0;
+
+	p = find_table("rsdt");
+	if (p)
+		*stmp = p->offset + paddr;
+	else
+		*stmp = (uint64_t)0;
 
 	/* always reset the checksum, even if it is seldom used */
 	pcksum = (uint8_t *)(blob + BLOB_HEADER_SIZE);
@@ -288,7 +299,7 @@ void fixup_rsdp(unsigned char *blob)
 			RSDP_CHECKSUM_BYTES, pcksum);
 }
 
-void fixup_facp(unsigned char *blob, int *offset)
+void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr)
 {
 	const int DSDT_ADDR_OFFSET = 40;
 	const int FACP_CHECKSUM_OFFSET = 9;
@@ -311,8 +322,8 @@ void fixup_facp(unsigned char *blob, int *offset)
 			facpp->offset + X_DSDT_ADDR_OFFSET);
 	p = find_table("dsdt");
 	if (p) {
-		*stmp = (uint32_t)p->offset;
-		*ltmp = (uint64_t)p->offset;
+		*stmp = (uint32_t)p->offset + paddr;
+		*ltmp = (uint64_t)p->offset + paddr;
 	} else {
 		*stmp = (uint32_t)0;
 		*ltmp = (uint64_t)0;
@@ -326,8 +337,8 @@ void fixup_facp(unsigned char *blob, int *offset)
 			facpp->offset + X_FIRMWARE_CTRL_OFFSET);
 	p = find_table("facs");
 	if (p) {
-		*stmp = (uint32_t)p->offset;
-		*ltmp = (uint64_t)p->offset;
+		*stmp = (uint32_t)p->offset + paddr;
+		*ltmp = (uint64_t)p->offset + paddr;
 	} else {
 		*stmp = (uint32_t)0;
 		*ltmp = (uint64_t)0;
@@ -341,7 +352,7 @@ void fixup_facp(unsigned char *blob, int *offset)
 			facpp->file_size, pcksum);
 }
 
-void fixup_xsdt(unsigned char *blob, int *offset)
+void fixup_xsdt(unsigned char *blob, int *offset, uint64_t paddr)
 {
 	const int FACP_ADDR_OFFSET = 36;
 	const int XSDT_CHECKSUM_OFFSET = 9;
@@ -362,7 +373,7 @@ void fixup_xsdt(unsigned char *blob, int *offset)
 	/* first table must be FACP (aka FADT) */
 	p = find_table("facp");
 	if (p)
-		*tmp = p->offset;
+		*tmp = p->offset + paddr;
 	else {
 		*tmp = (uint64_t)0;
 		return;
@@ -379,7 +390,7 @@ void fixup_xsdt(unsigned char *blob, int *offset)
 				delta = add_table(blob, p->signature,
 						*offset, NOT_REQUIRED);
 				*offset += delta;
-				*tmp++ = p->offset;
+				*tmp++ = p->offset + paddr;
 				allowed--;
 				if (allowed < 1)
 					break;
@@ -430,6 +441,8 @@ int main(int argc, char *argv[])
 	char *homedir;
 	char *acpi_blob_name;
 	char *iasl_cmd;
+	char *paddr_cmd;
+	uint64_t paddr = 0;
 	char sig[SIG_LENGTH];
 	struct table *np;
 	int opt;
@@ -442,7 +455,7 @@ int main(int argc, char *argv[])
 	iasl_cmd = NULL;
 	quiet = 0;
 
-	while ((opt = getopt(argc, argv, "d:o:i:c:q")) != EOF) {
+	while ((opt = getopt(argc, argv, "d:o:i:c:p:q")) != EOF) {
 		switch (opt) {
 		case 'd':
 			homedir = optarg;
@@ -455,6 +468,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'c':
 			iasl_cmd = optarg;
+			break;
+		case 'p':
+			paddr_cmd = optarg;
 			break;
 		case 'q':
 			quiet = 1;
@@ -475,6 +491,18 @@ int main(int argc, char *argv[])
 	}
 	if (!iasl_cmd)
 		iasl_cmd = "iasl -l";
+
+	if (paddr_cmd) {
+		errno = 0;
+		paddr = strtoull(paddr_cmd, NULL, 0);
+		if (errno) {
+			printf("invalid physical address given\n");
+			return 1;
+		} else {
+			printf("relocating blob to 0x%llx\n", paddr);
+		}
+		paddr += BLOB_HEADER_SIZE;
+	}
 
 	/* what tables do we need to do something about? */
 	err = read_manifest(homedir, manifest_name);
@@ -525,11 +553,11 @@ int main(int argc, char *argv[])
 	offset += delta;
 
 	/* patch up all the offsets if needed */
-	fixup_rsdp(blob);
-	fixup_facp(blob, &offset);
+	fixup_rsdp(blob, paddr);
+	fixup_facp(blob, &offset, paddr);
 
 	/* this fixup MUST always be called LAST -- it uses any unused tables */
-	fixup_xsdt(blob, &offset);
+	fixup_xsdt(blob, &offset, paddr);
 
 	/* all done, so write out the blob */
 	write_blob(homedir, acpi_blob_name, blob, blob_size + BLOB_HEADER_SIZE);
@@ -555,4 +583,3 @@ int main(int argc, char *argv[])
 
 	return err;
 }
-
