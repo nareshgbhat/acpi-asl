@@ -1,5 +1,5 @@
 %.acpi : FORCE
-	${MAB} -d $@ -i $(basename $@).manifest -o $@
+	$(MAB) -d $@ -i $(basename $@).manifest -o $@
 
 clean :
 	-rm *.acpi/*.aml
