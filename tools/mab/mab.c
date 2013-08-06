@@ -231,13 +231,32 @@ void set_checksum(unsigned char *start, int len, uint8_t *cksum)
 	*cksum = (uint8_t)(0 - newsum);
 }
 
-int add_table(unsigned char *blob, char *table_name, int offset, int reqd)
+int add_table(unsigned char **blob, char *table_name, int offset, int reqd)
 {
 	struct table *p;
+	int new_offset;
+	int adjustment = 0;
 
 	p = find_table(table_name);
+	new_offset = offset + p->file_size;
+
+	/*
+	 * Handle crossing of page boundaries to prevent problems
+	 * on armv7 with small page sizes
+	 */
+	if ((new_offset / PAGE_SIZE) != (offset / PAGE_SIZE)) {
+		adjustment = PAGE_SIZE - (offset % PAGE_SIZE);
+		/*
+		 * If this is the first page crossing remove the
+		 * blob header from calculations
+		 */
+		if (!(offset / PAGE_SIZE))
+			adjustment -= BLOB_HEADER_SIZE;
+	}
+
+	*blob = realloc(*blob, offset + adjustment + p->file_size + BLOB_HEADER_SIZE);
 	if (p) {
-		write_table(blob, p, offset);
+		write_table(*blob, p, offset + adjustment);
 	} else {
 		if (reqd) {
 			printf("? %s table is required\n", table_name);
@@ -246,7 +265,7 @@ int add_table(unsigned char *blob, char *table_name, int offset, int reqd)
 	}
 
 	/* NB: ACPI table size cannot be zero -- there must be a header */
-	return p->file_size;
+	return p->file_size + adjustment;
 }
 
 void fixup_rsdp(unsigned char *blob, uint64_t paddr)
@@ -349,7 +368,7 @@ void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr)
 			facpp->file_size, pcksum);
 }
 
-void fixup_xsdt(unsigned char *blob, int *offset, uint64_t paddr)
+void fixup_xsdt(unsigned char **blob, int *offset, uint64_t paddr)
 {
 	const int FACP_ADDR_OFFSET = 36;
 	const int XSDT_CHECKSUM_OFFSET = 9;
@@ -363,7 +382,7 @@ void fixup_xsdt(unsigned char *blob, int *offset, uint64_t paddr)
 	int allowed;
 
 	xsdtp = find_table("xsdt");
-	tmp = (uint64_t *)(blob + BLOB_HEADER_SIZE +
+	tmp = (uint64_t *)(*blob + BLOB_HEADER_SIZE +
 			xsdtp->offset + FACP_ADDR_OFFSET);
 	allowed = (xsdtp->file_size - XSDT_HEADER_SIZE) / sizeof(uint64_t);
 
@@ -396,9 +415,9 @@ void fixup_xsdt(unsigned char *blob, int *offset, uint64_t paddr)
 	}
 
 	/* always reset the checksum, even if it is seldom used */
-	pcksum = (uint8_t *)(blob + BLOB_HEADER_SIZE);
+	pcksum = (uint8_t *)(*blob + BLOB_HEADER_SIZE);
 	pcksum = (uint8_t *)(pcksum + xsdtp->offset + XSDT_CHECKSUM_OFFSET);
-	set_checksum((unsigned char *)(blob + BLOB_HEADER_SIZE + xsdtp->offset),
+	set_checksum((unsigned char *)(*blob + BLOB_HEADER_SIZE + xsdtp->offset),
 			xsdtp->file_size, pcksum);
 }
 
@@ -430,7 +449,6 @@ int main(int argc, char *argv[])
 {
 	int err = 0;
 	int ii, jj;
-	int blob_size;
 	int offset;
 	int delta;
 	unsigned char *blob;
@@ -514,37 +532,31 @@ int main(int argc, char *argv[])
 		np->file_size = get_file_size(np->aml_name);
 	}
 
-	/* build up the contents of the blob, table by table */
-	blob_size = 0;
-	LIST_FOREACH(np, &thead, tables)
-	blob_size += np->file_size;
-	blob = (unsigned char *)malloc(blob_size + BLOB_HEADER_SIZE);
-	memset(blob, 0, blob_size + BLOB_HEADER_SIZE);
+	blob = (unsigned char *)malloc(BLOB_HEADER_SIZE);
 
-	set_blob_header(blob, blob_size);
 	offset = 0;
 
-	delta = add_table(blob, "rsdp", offset, REQUIRED);
+	delta = add_table(&blob, "rsdp", offset, REQUIRED);
 	if (!delta)
 		return 1;
 	offset += delta;
 
-	delta = add_table(blob, "xsdt", offset, REQUIRED);
+	delta = add_table(&blob, "xsdt", offset, REQUIRED);
 	if (!delta)
 		return 1;
 	offset += delta;
 
-	delta = add_table(blob, "facp", offset, REQUIRED);
+	delta = add_table(&blob, "facp", offset, REQUIRED);
 	if (!delta)
 		return 1;
 	offset += delta;
 
-	delta = add_table(blob, "dsdt", offset, REQUIRED);
+	delta = add_table(&blob, "dsdt", offset, REQUIRED);
 	if (!delta)
 		return 1;
 	offset += delta;
 
-	delta = add_table(blob, "facs", offset, REQUIRED);
+	delta = add_table(&blob, "facs", offset, REQUIRED);
 	if (!delta)
 		return 1;
 	offset += delta;
@@ -554,10 +566,13 @@ int main(int argc, char *argv[])
 	fixup_facp(blob, &offset, paddr);
 
 	/* this fixup MUST always be called LAST -- it uses any unused tables */
-	fixup_xsdt(blob, &offset, paddr);
+	fixup_xsdt(&blob, &offset, paddr);
+
+	/* set the final blob size in header */
+	set_blob_header(blob, offset);
 
 	/* all done, so write out the blob */
-	write_blob(homedir, acpi_blob_name, blob, blob_size + BLOB_HEADER_SIZE);
+	write_blob(homedir, acpi_blob_name, blob, offset + BLOB_HEADER_SIZE);
 
 	if (!quiet) {
 		printf("%s %s\n", PROGNAME, VERSION);
