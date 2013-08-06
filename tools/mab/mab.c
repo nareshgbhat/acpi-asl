@@ -188,9 +188,6 @@ void write_table(unsigned char *blob, struct table *tp, int offset)
 	unsigned char *start;
 	FILE *fp;
 
-	buf = (unsigned char *)malloc(tp->file_size);
-	memset(buf, 0, tp->file_size);
-
 	tp->offset = offset;
 	start = (unsigned char *)(blob + BLOB_HEADER_SIZE + offset);
 	fp = fopen(tp->aml_name, "r");
