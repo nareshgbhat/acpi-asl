@@ -468,6 +468,7 @@ int main(int argc, char *argv[])
 	homedir = NULL;
 	acpi_blob_name = NULL;
 	iasl_cmd = NULL;
+	paddr_cmd = NULL;
 	quiet = 0;
 
 	while ((opt = getopt(argc, argv, "d:o:i:c:p:q")) != EOF) {
@@ -517,6 +518,10 @@ int main(int argc, char *argv[])
 			printf("relocating blob to 0x%llx\n", paddr);
 		}
 		paddr += BLOB_HEADER_SIZE;
+	} else {
+		printf("? missing required physical address parameter\n");
+		usage();
+		return 1;
 	}
 
 	/* what tables do we need to do something about? */
