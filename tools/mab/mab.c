@@ -32,13 +32,13 @@ void usage(void)
 {
 	printf("%s %s\n", PROGNAME, VERSION);
 	printf("usage: %s -d <dir> -o <blob> -i <manifest> ", PROGNAME);
-	printf("[-c <iasl-cmd>] [-q]\n");
+	printf("-p <paddr> [-c <iasl-cmd>] [-q]\n");
 	printf("\n");
 	printf("   -d <dir>      => directory of ASL files\n");
 	printf("   -o <blob>     => file name for resulting ACPI blob\n");
 	printf("   -i <manifest> => list of AML files needed\n");
 	printf("   -c <iasl-cmd> => iasl command to use (default: iasl -l)\n");
-	printf("   -p <paddr>    => physical address to relocate to.\n");
+	printf("   -p <paddr>    => physical address to relocate to\n");
 	printf("   -q            => if given, supress output\n");
 }
 
