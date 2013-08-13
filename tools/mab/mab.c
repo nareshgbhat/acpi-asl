@@ -579,16 +579,19 @@ int main(int argc, char *argv[])
 	/* all done, so write out the blob */
 	write_blob(homedir, acpi_blob_name, blob, offset + BLOB_HEADER_SIZE);
 
+	/* make sure we had room for all of the tables */
+	LIST_FOREACH(np, &thead, tables) {
+		if (np->offset < 0) {
+			for (jj = 0; jj < SIG_LENGTH; jj++)
+				sig[jj] = toupper(np->signature[jj]);
+			printf("? no room in XSDT for %s (%4s)\n",
+				basename(np->asl_name), sig);
+			err = 2;	/* anything non-zero, really... */
+		}
+	}
+
 	if (!quiet) {
 		printf("%s %s\n", PROGNAME, VERSION);
-		LIST_FOREACH(np, &thead, tables) {
-			if (np->offset < 0) {
-				for (jj = 0; jj < SIG_LENGTH; jj++)
-					sig[jj] = toupper(np->signature[jj]);
-				printf("? no room in XSDT for %s (%4s)\n",
-						basename(np->asl_name), sig);
-			}
-		}
 		ii = 0;
 		LIST_FOREACH(np, &thead, tables) {
 			printf("[%03d] %4s : %s (%d bytes @ 0x%08x)\n", ii,
