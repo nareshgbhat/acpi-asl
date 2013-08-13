@@ -23,7 +23,7 @@ DefinitionBlock (
 			Name (_HID, "LINA0001")
 			Name (_UID, 0)
 
-			Method (_CRS, 0x0, NotSerialized) {
+			Method (_CRS, 0x0, Serialized) {
 				Name (RBUF, ResourceTemplate ()
 				{
 					Memory32Fixed (ReadWrite, 0x12C60000, 0x00000100)
