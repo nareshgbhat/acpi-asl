@@ -26,7 +26,8 @@
 #define REQUIRED		1
 #define SIG_LENGTH		4
 
-const char VERSION[] = { "0.27.2" };
+/* VERSION a.b.c = <public release>.<functionality changes>.<bug fixes> */
+const char VERSION[] = { "0.27.3" };
 const char PROGNAME[] = { "mab" };
 
 char *known_sigs[] = {
