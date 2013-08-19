@@ -9,7 +9,7 @@
 DefinitionBlock (
 	"dsdt.aml",             // output filename
 	"DSDT",                 // table signature
-	1,                      // DSDT compliance revision
+	2,                      // DSDT compliance revision
 	"LINARO",               // OEM ID
 	"FOUNDATI",             // table ID
 	0x00000002)             // OEM revision

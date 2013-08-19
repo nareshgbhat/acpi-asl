@@ -9,7 +9,7 @@
 
 [0004]                          Signature : "APIC"
 [0004]                       Table Length : 000000F6
-[0001]                           Revision : 01
+[0001]                           Revision : 03
 [0001]                           Checksum : B0
 [0006]                             Oem ID : "LINARO"
 [0008]                       Oem Table ID : "ARNDALE "
