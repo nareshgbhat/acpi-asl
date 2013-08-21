@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, Al Stone <al.stone@linaro.org>
  *
- * [DSDT] Description of the Arndale board (exynos5250)
+ * [DSDT] Description of the ARMv8 foundation model
  *
  * This source is released under the terms of the GPLv2.
  */

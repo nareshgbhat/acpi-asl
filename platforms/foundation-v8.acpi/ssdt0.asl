@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, Al Stone <al.stone@linaro.org>
  *
- * [SSDT] Description of the Arndale board (exynos5250) GPIO structure
+ * [SSDT] Description of the ARMv8 foundation model GPIO structure
  *
  * This source is released under the terms of the GPLv2.
  */
