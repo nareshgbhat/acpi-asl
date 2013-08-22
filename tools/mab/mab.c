@@ -190,7 +190,7 @@ void write_table(unsigned char *blob, struct table *tp, int offset)
 	FILE *fp;
 
 	tp->offset = offset;
-	start = (unsigned char *)(blob + BLOB_HEADER_SIZE + offset);
+	start = (unsigned char *)(blob + offset);
 	fp = fopen(tp->aml_name, "r");
 	if (fp) {
 		fread(start, 1, tp->file_size, fp);
@@ -239,7 +239,7 @@ int add_table(unsigned char **blob, char *table_name, int offset, int reqd)
 	int adjustment = 0;
 
 	p = find_table(table_name);
-	new_offset = offset + p->file_size + BLOB_HEADER_SIZE;
+	new_offset = offset + p->file_size;
 
 	/*
 	 * Handle crossing of page boundaries to prevent problems
@@ -255,9 +255,10 @@ int add_table(unsigned char **blob, char *table_name, int offset, int reqd)
 			adjustment -= BLOB_HEADER_SIZE;
 	}
 
-	*blob = realloc(*blob, offset + adjustment + p->file_size + BLOB_HEADER_SIZE);
 	if (p) {
+		*blob = realloc(*blob, offset + adjustment + p->file_size);
 		write_table(*blob, p, offset + adjustment);
+		p->offset = offset + adjustment;
 	} else {
 		if (reqd) {
 			printf("? %s table is required\n", table_name);
@@ -294,10 +295,8 @@ void fixup_rsdp(unsigned char *blob, uint64_t paddr)
 	 * seriously wrong far earlier.
 	 */
 	rsdpp = find_table("rsdp");
-	stmp = (uint32_t *)(blob + BLOB_HEADER_SIZE +
-			rsdpp->offset + RSDT_ADDR_OFFSET);
-	ltmp = (uint64_t *)(blob + BLOB_HEADER_SIZE +
-			rsdpp->offset + XSDT_ADDR_OFFSET);
+	stmp = (uint32_t *)(blob + rsdpp->offset + RSDT_ADDR_OFFSET);
+	ltmp = (uint64_t *)(blob + rsdpp->offset + XSDT_ADDR_OFFSET);
 
 	p = find_table("xsdt");
 	if (p)
@@ -312,16 +311,13 @@ void fixup_rsdp(unsigned char *blob, uint64_t paddr)
 		*stmp = (uint64_t)0;
 
 	/* always reset the checksum, even if it is seldom used */
-	pcksum = (uint8_t *)(blob + BLOB_HEADER_SIZE);
-	pcksum = (uint8_t *)
-		 (pcksum + rsdpp->offset + RSDP_FIRST_CHECKSUM_OFFSET);
-	set_checksum((unsigned char *)(blob + BLOB_HEADER_SIZE + rsdpp->offset),
+	pcksum = (uint8_t *)(blob + rsdpp->offset + RSDP_FIRST_CHECKSUM_OFFSET);
+	set_checksum((unsigned char *)(blob + rsdpp->offset),
 			RSDP_FIRST_CHECKSUM_BYTES, pcksum);
 
-	pcksum = (uint8_t *)(blob + BLOB_HEADER_SIZE);
 	pcksum = (uint8_t *)
-		 (pcksum + rsdpp->offset + RSDP_SECOND_CHECKSUM_OFFSET);
-	set_checksum((unsigned char *)(blob + BLOB_HEADER_SIZE + rsdpp->offset),
+		 (blob + rsdpp->offset + RSDP_SECOND_CHECKSUM_OFFSET);
+	set_checksum((unsigned char *)(blob + rsdpp->offset),
 			RSDP_SECOND_CHECKSUM_BYTES, pcksum);
 }
 
@@ -342,10 +338,8 @@ void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr, int facs64)
 	facpp = find_table("facp");
 
 	/* add in the DSDT and X_DSDT addresses */
-	stmp = (uint32_t *)(blob + BLOB_HEADER_SIZE +
-			facpp->offset + DSDT_ADDR_OFFSET);
-	ltmp = (uint64_t *)(blob + BLOB_HEADER_SIZE +
-			facpp->offset + X_DSDT_ADDR_OFFSET);
+	stmp = (uint32_t *)(blob + facpp->offset + DSDT_ADDR_OFFSET);
+	ltmp = (uint64_t *)(blob + facpp->offset + X_DSDT_ADDR_OFFSET);
 	p = find_table("dsdt");
 	if (p) {
 		if (facs64) {
@@ -362,10 +356,8 @@ void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr, int facs64)
 	}
 
 	/* add in the FIRMWARE_CTRL and X_FIRMWARE_CTRL addresses */
-	stmp = (uint32_t *)(blob + BLOB_HEADER_SIZE +
-			    facpp->offset + FIRMWARE_CTRL_OFFSET);
-	ltmp = (uint64_t *)(blob + BLOB_HEADER_SIZE +
-			facpp->offset + X_FIRMWARE_CTRL_OFFSET);
+	stmp = (uint32_t *)(blob + facpp->offset + FIRMWARE_CTRL_OFFSET);
+	ltmp = (uint64_t *)(blob + facpp->offset + X_FIRMWARE_CTRL_OFFSET);
 	p = find_table("facs");
 	if (p) {
 		if (facs64) {
@@ -382,9 +374,8 @@ void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr, int facs64)
 	}
 
 	/* always reset the checksum, even if it is seldom used */
-	pcksum = (uint8_t *)(blob + BLOB_HEADER_SIZE);
-	pcksum = (uint8_t *)(pcksum + facpp->offset + FACP_CHECKSUM_OFFSET);
-	set_checksum((unsigned char *)(blob + BLOB_HEADER_SIZE + facpp->offset),
+	pcksum = (uint8_t *)(blob + facpp->offset + FACP_CHECKSUM_OFFSET);
+	set_checksum((unsigned char *)(blob + facpp->offset),
 			facpp->file_size, pcksum);
 }
 
@@ -402,8 +393,7 @@ void fixup_xsdt(unsigned char **blob, int *offset, uint64_t paddr)
 	int allowed;
 
 	xsdtp = find_table("xsdt");
-	tmp = (uint64_t *)(*blob + BLOB_HEADER_SIZE +
-			xsdtp->offset + FACP_ADDR_OFFSET);
+	tmp = (uint64_t *)(*blob + xsdtp->offset + FACP_ADDR_OFFSET);
 	allowed = (xsdtp->file_size - XSDT_HEADER_SIZE) / sizeof(uint64_t);
 
 	/* first table must be FACP (aka FADT) */
@@ -435,9 +425,8 @@ void fixup_xsdt(unsigned char **blob, int *offset, uint64_t paddr)
 	}
 
 	/* always reset the checksum, even if it is seldom used */
-	pcksum = (uint8_t *)(*blob + BLOB_HEADER_SIZE);
-	pcksum = (uint8_t *)(pcksum + xsdtp->offset + XSDT_CHECKSUM_OFFSET);
-	set_checksum((unsigned char *)(*blob + BLOB_HEADER_SIZE + xsdtp->offset),
+	pcksum = (uint8_t *)(*blob + xsdtp->offset + XSDT_CHECKSUM_OFFSET);
+	set_checksum((unsigned char *)(*blob + xsdtp->offset),
 			xsdtp->file_size, pcksum);
 }
 
@@ -542,7 +531,6 @@ int main(int argc, char *argv[])
 		} else {
 			printf("relocating blob to 0x%llx\n", paddr);
 		}
-		paddr += BLOB_HEADER_SIZE;
 	} else {
 		printf("? missing required physical address parameter\n");
 		usage();
@@ -564,7 +552,7 @@ int main(int argc, char *argv[])
 
 	blob = (unsigned char *)malloc(BLOB_HEADER_SIZE);
 
-	offset = 0;
+	offset = BLOB_HEADER_SIZE;
 
 	delta = add_table(&blob, "rsdp", offset, REQUIRED);
 	if (!delta)
