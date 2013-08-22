@@ -32,7 +32,8 @@ void usage(void)
 {
 	printf("%s %s\n", PROGNAME, VERSION);
 	printf("usage: %s -d <dir> -o <blob> -i <manifest> ", PROGNAME);
-	printf("-p <paddr> [-c <iasl-cmd>] [-q] [-f]\n");
+	printf("-p <paddr> [-c <iasl-cmd>] [-q]\n");
+	printf("           [-f] [-H]\n");
 	printf("\n");
 	printf("   -d <dir>      => directory of ASL files\n");
 	printf("   -f            => if given, use FADT 32-bit fields\n");
@@ -40,7 +41,8 @@ void usage(void)
 	printf("   -i <manifest> => list of AML files needed\n");
 	printf("   -c <iasl-cmd> => iasl command to use (default: iasl -l)\n");
 	printf("   -p <paddr>    => physical address to relocate to\n");
-	printf("   -q            => if given, supress output\n");
+	printf("   -q            => if given, suppress output\n");
+	printf("   -H            => if given, do NOT add a blob header\n");
 }
 
 int get_file_size(char *fname)
@@ -472,6 +474,7 @@ int main(int argc, char *argv[])
 	int opt;
 	int quiet;
 	int facs64;
+	int use_blob_header;
 
 	/* parameter handling */
 	manifest_name = NULL;
@@ -481,8 +484,9 @@ int main(int argc, char *argv[])
 	paddr_cmd = NULL;
 	quiet = 0;
 	facs64 = 1;
+	use_blob_header = 1;
 
-	while ((opt = getopt(argc, argv, "d:fo:i:c:p:q")) != EOF) {
+	while ((opt = getopt(argc, argv, "d:fo:i:c:p:qH")) != EOF) {
 		switch (opt) {
 		case 'd':
 			homedir = optarg;
@@ -504,6 +508,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'q':
 			quiet = 1;
+			break;
+		case 'H':
+			use_blob_header = 0;
 			break;
 		default:
 			usage();
@@ -552,7 +559,7 @@ int main(int argc, char *argv[])
 
 	blob = (unsigned char *)malloc(BLOB_HEADER_SIZE);
 
-	offset = BLOB_HEADER_SIZE;
+	offset = use_blob_header ? BLOB_HEADER_SIZE : 0;
 
 	delta = add_table(&blob, "rsdp", offset, REQUIRED);
 	if (!delta)
@@ -587,10 +594,11 @@ int main(int argc, char *argv[])
 	fixup_xsdt(&blob, &offset, paddr);
 
 	/* set the final blob size in header */
-	set_blob_header(blob, offset);
+	if (use_blob_header)
+		set_blob_header(blob, offset);
 
 	/* all done, so write out the blob */
-	write_blob(homedir, acpi_blob_name, blob, offset + BLOB_HEADER_SIZE);
+	write_blob(homedir, acpi_blob_name, blob, offset);
 
 	/* make sure we had room for all of the tables */
 	LIST_FOREACH(np, &thead, tables) {
