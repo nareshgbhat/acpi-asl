@@ -615,9 +615,11 @@ int main(int argc, char *argv[])
 		printf("%s %s\n", PROGNAME, VERSION);
 		ii = 0;
 		LIST_FOREACH(np, &thead, tables) {
-			printf("[%03d] %4s : %s (%d bytes @ 0x%08x)\n", ii,
-					np->signature, basename(np->aml_name),
-					np->file_size, np->offset);
+			printf("[%03d] %4s : %s\n", ii,
+			       np->signature, basename(np->aml_name));
+			printf("      %d bytes @ 0x%016x, reloc @ 0x%016x\n",
+			       np->file_size, np->offset,
+			       np->offset + paddr);
 			ii++;
 		}
 	}
