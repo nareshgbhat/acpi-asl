@@ -32,9 +32,10 @@ void usage(void)
 {
 	printf("%s %s\n", PROGNAME, VERSION);
 	printf("usage: %s -d <dir> -o <blob> -i <manifest> ", PROGNAME);
-	printf("-p <paddr> [-c <iasl-cmd>] [-q]\n");
+	printf("-p <paddr> [-c <iasl-cmd>] [-q] [-f]\n");
 	printf("\n");
 	printf("   -d <dir>      => directory of ASL files\n");
+	printf("   -f            => if given, use FADT 32-bit fields\n");
 	printf("   -o <blob>     => file name for resulting ACPI blob\n");
 	printf("   -i <manifest> => list of AML files needed\n");
 	printf("   -c <iasl-cmd> => iasl command to use (default: iasl -l)\n");
@@ -315,7 +316,7 @@ void fixup_rsdp(unsigned char *blob, uint64_t paddr)
 			RSDP_CHECKSUM_BYTES, pcksum);
 }
 
-void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr)
+void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr, int facs64)
 {
 	const int DSDT_ADDR_OFFSET = 40;
 	const int FACP_CHECKSUM_OFFSET = 9;
@@ -338,8 +339,13 @@ void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr)
 			facpp->offset + X_DSDT_ADDR_OFFSET);
 	p = find_table("dsdt");
 	if (p) {
-		*stmp = (uint32_t)p->offset + paddr;
-		*ltmp = (uint64_t)p->offset + paddr;
+		if (facs64) {
+			*stmp = (uint32_t)0;
+			*ltmp = (uint64_t)p->offset + paddr;
+		} else {
+			*stmp = (uint32_t)p->offset + paddr;
+			*ltmp = (uint64_t)0;
+		}
 	} else {
 		*stmp = (uint32_t)0;
 		*ltmp = (uint64_t)0;
@@ -348,13 +354,18 @@ void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr)
 
 	/* add in the FIRMWARE_CTRL and X_FIRMWARE_CTRL addresses */
 	stmp = (uint32_t *)(blob + BLOB_HEADER_SIZE +
-			facpp->offset + FIRMWARE_CTRL_OFFSET);
+			    facpp->offset + FIRMWARE_CTRL_OFFSET);
 	ltmp = (uint64_t *)(blob + BLOB_HEADER_SIZE +
 			facpp->offset + X_FIRMWARE_CTRL_OFFSET);
 	p = find_table("facs");
 	if (p) {
-		*stmp = (uint32_t)p->offset + paddr;
-		*ltmp = (uint64_t)p->offset + paddr;
+		if (facs64) {
+			*stmp = (uint32_t)0;
+			*ltmp = (uint64_t)p->offset + paddr;
+		} else {
+			*stmp = (uint32_t)p->offset + paddr;
+			*ltmp = (uint64_t)0;
+		}
 	} else {
 		*stmp = (uint32_t)0;
 		*ltmp = (uint64_t)0;
@@ -462,6 +473,7 @@ int main(int argc, char *argv[])
 	struct table *np;
 	int opt;
 	int quiet;
+	int facs64;
 
 	/* parameter handling */
 	manifest_name = NULL;
@@ -470,11 +482,15 @@ int main(int argc, char *argv[])
 	iasl_cmd = NULL;
 	paddr_cmd = NULL;
 	quiet = 0;
+	facs64 = 1;
 
-	while ((opt = getopt(argc, argv, "d:o:i:c:p:q")) != EOF) {
+	while ((opt = getopt(argc, argv, "d:fo:i:c:p:q")) != EOF) {
 		switch (opt) {
 		case 'd':
 			homedir = optarg;
+			break;
+		case 'f':
+			facs64 = 0;
 			break;
 		case 'o':
 			acpi_blob_name = optarg;
@@ -568,7 +584,7 @@ int main(int argc, char *argv[])
 
 	/* patch up all the offsets if needed */
 	fixup_rsdp(blob, paddr);
-	fixup_facp(blob, &offset, paddr);
+	fixup_facp(blob, &offset, paddr, facs64);
 
 	/* this fixup MUST always be called LAST -- it uses any unused tables */
 	fixup_xsdt(&blob, &offset, paddr);
