@@ -239,7 +239,7 @@ int add_table(unsigned char **blob, char *table_name, int offset, int reqd)
 	int adjustment = 0;
 
 	p = find_table(table_name);
-	new_offset = offset + p->file_size;
+	new_offset = offset + p->file_size + BLOB_HEADER_SIZE;
 
 	/*
 	 * Handle crossing of page boundaries to prevent problems
@@ -275,8 +275,10 @@ void fixup_rsdp(unsigned char *blob, uint64_t paddr)
 	 * essentially been deprecated.  Instead, use the 64-bit
 	 * XSDT address though be sure to use little-endian values.
 	 */
-	const int RSDP_CHECKSUM_BYTES = 20;
-	const int RSDP_CHECKSUM_OFFSET = 8;
+	const int RSDP_FIRST_CHECKSUM_BYTES = 20;
+	const int RSDP_FIRST_CHECKSUM_OFFSET = 8;
+	const int RSDP_SECOND_CHECKSUM_BYTES = 36;
+	const int RSDP_SECOND_CHECKSUM_OFFSET = 32;
 	const int RSDT_ADDR_OFFSET = 16;
 	const int XSDT_ADDR_OFFSET = 24;
 
@@ -311,9 +313,16 @@ void fixup_rsdp(unsigned char *blob, uint64_t paddr)
 
 	/* always reset the checksum, even if it is seldom used */
 	pcksum = (uint8_t *)(blob + BLOB_HEADER_SIZE);
-	pcksum = (uint8_t *)(pcksum + rsdpp->offset + RSDP_CHECKSUM_OFFSET);
+	pcksum = (uint8_t *)
+		 (pcksum + rsdpp->offset + RSDP_FIRST_CHECKSUM_OFFSET);
 	set_checksum((unsigned char *)(blob + BLOB_HEADER_SIZE + rsdpp->offset),
-			RSDP_CHECKSUM_BYTES, pcksum);
+			RSDP_FIRST_CHECKSUM_BYTES, pcksum);
+
+	pcksum = (uint8_t *)(blob + BLOB_HEADER_SIZE);
+	pcksum = (uint8_t *)
+		 (pcksum + rsdpp->offset + RSDP_SECOND_CHECKSUM_OFFSET);
+	set_checksum((unsigned char *)(blob + BLOB_HEADER_SIZE + rsdpp->offset),
+			RSDP_SECOND_CHECKSUM_BYTES, pcksum);
 }
 
 void fixup_facp(unsigned char *blob, int *offset, uint64_t paddr, int facs64)
