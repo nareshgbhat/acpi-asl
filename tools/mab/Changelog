@@ -1,3 +1,22 @@
+0.28.1 -- 2013-07-19
+	-- Bug fix: Makefile needs to rebuild if .h changes
+	-- Bug fix: Makefile needs to actually use CFLAGS
+	-- Feature/Bug: when doing relocation cleanup in the FADT, we need
+	   to use _either_ the 32- or 64-bit addresses, and not both (which
+	   is what we currently do); add a -f option to tell mab to use
+	   32-bit in the FADT, and default to 64-bit otherwise.  NB: 64-bit
+	   is always the safe choice but 32-bit needs to be allowed for those
+	   that use it to ensure they use addresses < 4GB for loadable tables.
+	-- Bug fix: there are two checksums in the RSDP but we only set
+	   the first one properly; set both of them.
+	-- Bug fix: print the actual blob offsets when reporting them with -q;
+	   they were off by the BLOB_HEADER_SIZE when reported.  This resulted
+	   in far less usage of BLOB_HEADER_SIZE, simplifying the code a bit
+	   as well
+	-- Feature: add -H option; when given, mab makes a blob that does NOT
+	   have the blob header we have been using.
+	-- Feature: print out the physical address if not being quiet
+
 0.27.3 -- 2013-07-13
 	-- Bug fix: add in a Changelog
 	-- Bug fix: if the XSDT was too small, it was only reported
