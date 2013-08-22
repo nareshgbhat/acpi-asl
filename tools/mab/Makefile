@@ -1,7 +1,7 @@
-CFLAGS	:= -g -I$(src)
+CFLAGS	:= -g
 
-mab : mab.c
-	$(CC) -o mab mab.c
+mab : mab.h mab.c
+	$(CC) $(CFLAGS) -o mab mab.c
 
 clean :
 	-rm mab
