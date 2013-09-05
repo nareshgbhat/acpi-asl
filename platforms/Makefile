@@ -6,9 +6,9 @@ endif
 	$(MAB) -d $@ $(PADDR_ARG) -i $(basename $@).manifest -o $@
 
 clean :
-	-rm *.acpi/*.aml
-	-rm *.acpi/*.lst
-	-rm *.acpi/*.acpi
+	-rm -f *.acpi/*.aml
+	-rm -f *.acpi/*.lst
+	-rm -f *.acpi/*.acpi
 
 FORCE :
 

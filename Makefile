@@ -1,19 +1,21 @@
 MABDIR := tools/mab/
 CABDIR := tools/cab/
+COMMON_DIR := tools/common/
 PLATDIR := platforms/
 
-%.acpi : $(MABDIR)/mab $(CABDIR)/cab
+%.acpi : mab cab
 	make MAB=$(CURDIR)/$(MABDIR)/mab PADDR=$(PADDR) -C $(PLATDIR) $@
 
-$(MABDIR)/mab : FORCE
-	make -C $(MABDIR)
+mab : FORCE
+	make -C $(MABDIR) PROG=mab
 
-$(CABDIR)/cab : FORCE
-	make -C $(CABDIR)
+cab : FORCE
+	make -C $(CABDIR) PROG=cab
 
 clean :
-	make -C $(MABDIR) clean
-	make -C $(CABDIR) clean
+	make -C $(MABDIR) clean PROG=mab
+	make -C $(CABDIR) clean PROG=cab
+	make -C $(COMMON_DIR) clean
 	make -C $(PLATDIR) clean
 
 FORCE :

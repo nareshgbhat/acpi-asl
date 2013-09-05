@@ -1,7 +1,11 @@
-CFLAGS	:= -g
+CFLAGS	:= -g -Wall -I../common/include
 
-cab : cab.h cab.c
-	$(CC) $(CFLAGS) -o cab cab.c
+HEADERS = $(wildcard *.h) $(wildcard ../common/include/*.h)
+
+SOURCES = $(wildcard *.c) $(wildcard ../common/*.c)
+
+$(PROG) : $(patsubst %.c,%.o, $(SOURCES)) $(HEADERS)
+	$(CC) $(CFLAGS) $(patsubst %.c,%.o, $(SOURCES)) -o $@
 
 clean :
-	-rm -f cab cab.o
+	-rm -f $(patsubst %.c,%.o, $(wildcard *.c)) $(PROG)
