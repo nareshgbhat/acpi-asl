@@ -112,7 +112,8 @@ int main(int argc, char *argv[])
 			printf("invalid physical address given\n");
 			return 1;
 		} else {
-			printf("relocating blob to 0x%llx\n", paddr);
+			printf("relocating blob to 0x%llx\n",
+			       (long long unsigned int)paddr);
 		}
 	} else {
 		printf("? missing required physical address parameter\n");
@@ -193,9 +194,9 @@ int main(int argc, char *argv[])
 		LIST_FOREACH(np, &thead, tables) {
 			printf("[%03d] %4s : %s\n", ii,
 			       np->signature, basename(np->aml_name));
-			printf("      %d bytes @ 0x%016x, reloc @ 0x%016x\n",
+			printf("      %d bytes @ 0x%016x, reloc @ 0x%016llx\n",
 			       np->file_size, np->offset,
-			       np->offset + paddr);
+			       (long long unsigned int)np->offset + paddr);
 			ii++;
 		}
 	}

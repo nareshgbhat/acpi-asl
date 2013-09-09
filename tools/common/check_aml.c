@@ -1,5 +1,5 @@
 /*
- * cab.c: helper functions for the tool to Check A Blob of ACPI tables
+ * check_aml.c: helper functions for the tool to Check A Blob of ACPI tables
  *
  * This file is subject to the terms and conditions of the GNU General
  * Public License.  See the file "COPYING" in the main directory of this
@@ -238,7 +238,7 @@ void find_all_tables(unsigned char *blob, int size, int base_addr)
 	offset = (int)(p - blob);
 
 	while (offset + SIG_LENGTH < size) {
-		if (valid_sig(p)) {
+		if (valid_sig((char *)p)) {
 			tp = check_table_entry(p);
 			if (tp) {
 				delta = TABLE_LEN_OFFSET;
@@ -260,7 +260,7 @@ void find_all_tables(unsigned char *blob, int size, int base_addr)
 			while (offset + SIG_LENGTH < size) {
 				p++;
 				offset++;
-				if (isalpha(*p) && valid_sig(p))
+				if (isalpha(*p) && valid_sig((char *)p))
 					break;
 			}
 		}
@@ -342,7 +342,7 @@ void check_xsdt_relocs(unsigned char *blob, int size, uint64_t paddr)
 		for (ii = 0; ii < cnt; ii++, tpaddr++) {
 			offset = (*tpaddr - paddr);
 			res = FAIL;
-			if (valid_sig((unsigned char *)blob + offset)) {
+			if (valid_sig((char *)blob + offset)) {
 				xp = find_table((char *)blob + offset);
 				if (xp) {
 					xp->ref_cnt++;
@@ -505,7 +505,7 @@ int check_print_summary(void)
 	printf("\nTotal tests: %d\n", passed + failed);
 	printf("Passed: %d\n", passed);
 	printf("Failed: %d\n", failed);
-	printf("Success rate: %0.1f%\n",
+	printf("Success rate: %0.1f%%\n",
 	       (100.0 * (float)passed) / (float)(passed + failed));
 
 	return failed;

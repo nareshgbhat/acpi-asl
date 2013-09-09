@@ -260,11 +260,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Save buffer to specified file. */
-	write_blob(homedir, apei_blob_name, buf, size);
+	write_blob(homedir, apei_blob_name, (unsigned char *)buf, size);
 
 	if (!quiet) {
 		printf("%s blob for %s APEI table testing created\n", apei_blob_name, blob_type);
-		printf("Physical address: 0x%llx\n", paddr);
+		printf("Physical address: 0x%llx\n", (long long unsigned int)paddr);
 	}
 
 	return BFAPEI_OK;

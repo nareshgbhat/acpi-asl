@@ -89,7 +89,7 @@ struct table *build_table_entry(char *dir, char *buf)
 				break;
 			sig[n++] = buf[ii];
 		}
-		if (!valid_sig((unsigned char*)sig)) {
+		if (!valid_sig(sig)) {
 			free(tmp);
 			return NULL;
 		}
