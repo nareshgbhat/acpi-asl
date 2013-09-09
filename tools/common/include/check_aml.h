@@ -34,15 +34,8 @@
 #define FAIL	0
 #define INFO	(-1)
 
-#define BLOB_HEADER_SIZE	8
-#define BLOB_MAGIC		"ACPI"
-#define BLOB_MAGIC_SIZE		4
-#define MAX_LINE		1024
 #define MIN_TABLE_LENGTH	36
-#define NOT_REQUIRED		0
-#define REQUIRED		1
 #define RSDP_LEN_OFFSET		20
-#define SIG_LENGTH		4
 #define TABLE_LEN_OFFSET	4
 
 #define SIG_APIC	"APIC"
