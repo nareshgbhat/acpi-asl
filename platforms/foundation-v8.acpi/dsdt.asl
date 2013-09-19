@@ -31,6 +31,12 @@ DefinitionBlock (
 			}
 		}
 
+		Device (HED)
+		{
+			Name (_HID, EisaId ("PNP0C33"))
+			Name (_UID, 0x00)
+		}
+
 		Device (SCK0)
 		{
 			Name (_HID, "ACPI0004")
