@@ -13,9 +13,9 @@
 [0001]                           Checksum : 15
 [0006]                             Oem ID : "LINARO"
 [0008]                       Oem Table ID : "RTSMVEV8"
-[0004]                       Oem Revision : 00000001
+[0004]                       Oem Revision : 00000002
 [0004]                    Asl Compiler ID : "INTL"
 [0004]              Asl Compiler Revision : 20100528
 
-[0004]           Boot Error Region Length : 00000000
-[0008]          Boot Error Region Address : 0000000000000000
+[0004]           Boot Error Region Length : 0x9D
+[0008]          Boot Error Region Address : 0xFFFF0008
