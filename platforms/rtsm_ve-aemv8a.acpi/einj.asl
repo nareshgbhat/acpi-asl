@@ -13,14 +13,14 @@
 [0001]                           Checksum : 09
 [0006]                             Oem ID : "LINARO"
 [0008]                       Oem Table ID : "RTSMVEV8"
-[0004]                       Oem Revision : 00000001
+[0004]                       Oem Revision : 00000002
 [0004]                    Asl Compiler ID : "INTL"
 [0004]              Asl Compiler Revision : 20100528
 
 [0004]            Injection Header Length : 00000030
 [0001]                              Flags : 00
 [0003]                           Reserved : 000000
-[0004]              Injection Entry Count : 0000000A
+[0004]              Injection Entry Count : 00000008
 
 [0001]                             Action : 00 [Begin Operation]
 [0001]                        Instruction : 00 [Read Register]
