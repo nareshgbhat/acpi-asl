@@ -12,7 +12,7 @@ DefinitionBlock (
 	2,                      // DSDT compliance revision
 	"LINARO",               // OEM ID
 	"ARNDALE ",             // table ID
-	0x00000002)             // OEM revision
+	0x00000003)             // OEM revision
 {
 	Scope (\_SB)
 	{
@@ -43,6 +43,21 @@ DefinitionBlock (
 
 			Method (FREQ, 0x0, NotSerialized) {
 				Return (20000)
+			}
+		}
+
+		Method (_OSC, 4, NotSerialized)
+		{
+			/* Platform-Wide OSPM Capabilities */
+			If(LEqual(Arg0,ToUUID("0811B06E-4A27-44F9-8D60-3CBBC22E7B48")))
+			{
+				/* APEI support unconditionally */
+				Return (Arg3)
+			} Else {
+				CreateDWordField (Arg3, Zero, CDW1)
+				/* Set invalid UUID error bit */
+				Or (CDW1, 0x04, CDW1)
+				Return (Arg3)
 			}
 		}
 
