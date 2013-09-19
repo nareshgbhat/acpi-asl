@@ -13,7 +13,7 @@
 [0001]                           Checksum : 09
 [0006]                             Oem ID : "LINARO"
 [0008]                       Oem Table ID : "FOUNDATI"
-[0004]                       Oem Revision : 00000002
+[0004]                       Oem Revision : 00000003
 [0004]                    Asl Compiler ID : "INTL"
 [0004]              Asl Compiler Revision : 20100528
 
@@ -33,7 +33,7 @@
 [0001]                          Bit Width : 40
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 04 [QWord Access:64]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0xFFFF0200
 
 [0008]                              Value : 0000000000000000
 [0008]                               Mask : FFFFFFFFFFFFFFFF
@@ -49,7 +49,7 @@
 [0001]                          Bit Width : 40
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 04 [QWord Access:64]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0xFFFF0208
 
 [0008]                              Value : 0000000000000000
 [0008]                               Mask : FFFFFFFFFFFFFFFF
@@ -65,7 +65,7 @@
 [0001]                          Bit Width : 40
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 04 [QWord Access:64]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0xFFFF0210
 
 [0008]                              Value : 0000000000000000
 [0008]                               Mask : FFFFFFFFFFFFFFFF
@@ -81,7 +81,7 @@
 [0001]                          Bit Width : 40
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 04 [QWord Access:64]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0xFFFF0218
 
 [0008]                              Value : 0000000000000000
 [0008]                               Mask : FFFFFFFFFFFFFFFF
@@ -97,7 +97,7 @@
 [0001]                          Bit Width : 40
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 04 [QWord Access:64]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0xFFFF0220
 
 [0008]                              Value : 0000000000000000
 [0008]                               Mask : FFFFFFFFFFFFFFFF
@@ -109,11 +109,11 @@
 [0001]                           Reserved : 00
 
 [0012]                    Register Region : [Generic Address Structure]
-[0001]                           Space ID : 01 [SystemIO]
+[0001]                           Space ID : 00 [SystemMemory]
 [0001]                          Bit Width : 10
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 02 [Word Access:16]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0xFFFF0228
 
 [0008]                              Value : 0000000000000000
 [0008]                               Mask : FFFFFFFFFFFFFFFF
@@ -129,7 +129,7 @@
 [0001]                          Bit Width : 40
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 04 [QWord Access:64]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0xFFFF0230
 
 [0008]                              Value : 0000000000000000
 [0008]                               Mask : FFFFFFFFFFFFFFFF
@@ -145,7 +145,7 @@
 [0001]                          Bit Width : 40
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 04 [QWord Access:64]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0xFFFF0238
 
 [0008]                              Value : 0000000000000000
 [0008]                               Mask : FFFFFFFFFFFFFFFF
