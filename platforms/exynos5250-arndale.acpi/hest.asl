@@ -33,7 +33,7 @@
 [0001]                          Bit Width : 40
 [0001]                         Bit Offset : 00
 [0001]               Encoded Access Width : 04 [QWord Access:64]
-[0008]                            Address : 0000000000000000
+[0008]                            Address : 0x43000000
 
 [0028]                             Notify : [Hardware Error Notification Structure]
 [0001]                        Notify Type : 03 [SCI]
