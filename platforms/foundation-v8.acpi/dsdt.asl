@@ -12,7 +12,7 @@ DefinitionBlock (
 	2,                      // DSDT compliance revision
 	"LINARO",               // OEM ID
 	"FOUNDATI",             // table ID
-	0x00000003)             // OEM revision
+	0x00000004)             // OEM revision
 {
 	Scope (\_SB)
 	{
@@ -261,6 +261,18 @@ DefinitionBlock (
 				Name (RBUF, ResourceTemplate() {
 					Memory32Fixed (ReadWrite, 0x1c130000, 0x1000)
 					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x4A}
+				})
+				Return (RBUF)
+			}
+		}
+
+		Device (PMU0) {
+			Name (_HID, "LINA0007")
+			Name (_UID, 0)
+
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {92, 93, 94, 95}
 				})
 				Return (RBUF)
 			}

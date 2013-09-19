@@ -12,7 +12,7 @@ DefinitionBlock (
 	2,			// DSDT compliance revision
 	"LINARO",		// OEM ID
 	"RTSMVEV8",		// table ID
-	0x00000003)		// OEM revision
+	0x00000004)		// OEM revision
 {
 	Scope (\_SB)
 	{
@@ -247,6 +247,18 @@ DefinitionBlock (
 				Name (RBUF, ResourceTemplate () {
 					Memory32Fixed (ReadWrite, 0x1a000000, 0x00010000)
 					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x2F}
+				})
+				Return (RBUF)
+			}
+		}
+
+		Device (PMU0) {
+			Name (_HID, "LINA0007")
+			Name (_UID, 0)
+
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {92, 93, 94, 95}
 				})
 				Return (RBUF)
 			}
