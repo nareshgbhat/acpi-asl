@@ -27,6 +27,13 @@ const char PROGNAME[] = { "bfapei" };
 		sizeof(struct acpi_hest_generic_data) + \
 		sizeof (struct cper_sec_mem_err)
 
+/* Register write macro helper */
+#define WRITE_LONG(blob, offset, value)	 {	\
+	uint64_t *add_ptr;			\
+	add_ptr = (uint64_t *) (blob + offset); \
+	*add_ptr = value;			\
+}
+
 /* ERST generic registers offset */
 uint64_t erst_reg_map[] = {
 	[ACPI_ERST_CHECK_BUSY_STATUS] 		= 0x130,
@@ -36,14 +43,23 @@ uint64_t erst_reg_map[] = {
 	[ACPI_ERST_GET_ERROR_ATTRIBUTES] 	= 0x178,
 };
 
-/* ERST macro helper */
-#define WRITE_LONG(blob, offset, value)	 {	\
-	uint64_t *add_ptr;			\
-	add_ptr = (uint64_t *) (blob + offset); \
-	*add_ptr = value;			\
-}
-
 #define WRITE_ERST_REG(blob, reg, value)	\
 	WRITE_LONG(blob, erst_reg_map[reg], value)
+
+/* EINJ generic registers offset */
+uint64_t einj_reg_map[] = {
+	[ACPI_EINJ_BEGIN_OPERATION] 		= 0x200,
+	[ACPI_EINJ_GET_TRIGGER_TABLE] 		= 0x208,
+	[ACPI_EINJ_SET_ERROR_TYPE] 		= 0x210,
+	[ACPI_EINJ_GET_ERROR_TYPE] 		= 0x218,
+	[ACPI_EINJ_END_OPERATION] 		= 0x220,
+	[ACPI_EINJ_EXECUTE_OPERATION] 		= 0x228,
+	[ACPI_EINJ_CHECK_BUSY_STATUS] 		= 0x230,
+	[ACPI_EINJ_GET_COMMAND_STATUS] 		= 0x238,
+
+};
+
+#define WRITE_EINJ_REG(blob, reg, value)	\
+	WRITE_LONG(blob, einj_reg_map[reg], value)
 
 #endif

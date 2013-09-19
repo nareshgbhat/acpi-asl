@@ -45,6 +45,10 @@
  *      |                    |
  *      +--------------------+ +0x200
  *      |                    |
+ *      |  place for EINJ    | EINJ driver reference to this region during
+ *      |  registers         | error injection.
+ *      |                    |
+ *      +--------------------+ +0x300
  *
  *     ~~~~~~~~~~~~~~~~~~~~~~~~
  *
@@ -182,6 +186,55 @@ static int bfapei_hest(char **buf, int *size, uint64_t paddr, int status)
 	return BFAPEI_OK;
 }
 
+static int bfapei_einj(char **buf, int *size, uint64_t paddr)
+{
+	struct acpi_hest_generic_status *block_ptr;
+	struct acpi_einj_trigger *trigger_tab;
+	struct acpi_whea_header *trigger_entry;
+	int reqr_size = 0x300;
+	uint64_t *add_ptr;
+
+	if (bfapei_expand_buf(buf, size, reqr_size))
+		return BFAPEI_FAIL;
+
+	/* Available error type: Memory Correctable */
+	WRITE_EINJ_REG(*buf, ACPI_EINJ_GET_ERROR_TYPE, 0x00000008);
+
+	WRITE_EINJ_REG(*buf, ACPI_EINJ_GET_COMMAND_STATUS, ACPI_EINJ_SUCCESS);
+	WRITE_EINJ_REG(*buf, ACPI_EINJ_CHECK_BUSY_STATUS, 1);
+
+	/*
+	 * Nothing to do more than just set status flag for previous prepared
+	 * ESB (error status block)
+	 */
+	WRITE_EINJ_REG(*buf, ACPI_EINJ_GET_TRIGGER_TABLE, paddr + 0x280);
+	trigger_tab = (struct acpi_einj_trigger *) (*buf + 0x280);
+	trigger_tab->header_size = sizeof(struct acpi_einj_trigger);
+	trigger_tab->table_size = sizeof(struct acpi_einj_trigger) +
+	    sizeof(struct acpi_whea_header);
+	trigger_tab->entry_count = 1;
+
+	trigger_entry = (struct acpi_whea_header *) ++trigger_tab;
+	trigger_entry->action = ACPI_EINJ_TRIGGER_ERROR;
+	trigger_entry->instruction = ACPI_EINJ_WRITE_REGISTER_VALUE;
+
+	trigger_entry->register_region.space_id = ACPI_ADR_SPACE_SYSTEM_MEMORY;
+	trigger_entry->register_region.bit_width = 40;
+	trigger_entry->register_region.bit_offset = 0;
+	trigger_entry->register_region.access_width = 4;
+
+	/* Obtain address of status block field */
+	add_ptr = (uint64_t *) *buf;
+	block_ptr = (struct acpi_hest_generic_status *) (++add_ptr);
+	trigger_entry->register_region.address =
+		paddr + ((char *)&(block_ptr->block_status) - *buf);
+
+	trigger_entry->value = 1;
+	trigger_entry->mask = 0xFFFFFFFFFFFFFFFFUL;
+
+	return BFAPEI_OK;
+}
+
 static int bfapei_erst(char **buf, int *size, uint64_t paddr)
 {
 	int reqr_size = 0x200;
@@ -247,6 +300,14 @@ int main(int argc, char *argv[]) {
 
 	if (strncmp(blob_type, "hest", 4) == 0) {
 		if (bfapei_hest(&buf, &size, paddr, 0))
+			return BFAPEI_FAIL;
+	}
+
+	if (strncmp(blob_type, "einj", 4) == 0) {
+		if (bfapei_hest(&buf, &size, paddr, 0))
+			return BFAPEI_FAIL;
+
+		if (bfapei_einj(&buf, &size, paddr))
 			return BFAPEI_FAIL;
 	}
 

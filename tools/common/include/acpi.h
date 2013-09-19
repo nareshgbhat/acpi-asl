@@ -201,4 +201,61 @@ enum acpi_erst_actions {
 	ACPI_ERST_ACTION_RESERVED = 16	/* 16 and greater are reserved */
 };
 
+#define ACPI_ADR_SPACE_SYSTEM_MEMORY    0
+
+enum acpi_einj_actions {
+	ACPI_EINJ_BEGIN_OPERATION = 0,
+	ACPI_EINJ_GET_TRIGGER_TABLE = 1,
+	ACPI_EINJ_SET_ERROR_TYPE = 2,
+	ACPI_EINJ_GET_ERROR_TYPE = 3,
+	ACPI_EINJ_END_OPERATION = 4,
+	ACPI_EINJ_EXECUTE_OPERATION = 5,
+	ACPI_EINJ_CHECK_BUSY_STATUS = 6,
+	ACPI_EINJ_GET_COMMAND_STATUS = 7,
+	ACPI_EINJ_SET_ERROR_TYPE_WITH_ADDRESS = 8,
+	ACPI_EINJ_ACTION_RESERVED = 9,	/* 9 and greater are reserved */
+	ACPI_EINJ_TRIGGER_ERROR = 0xFF	/* Except for this value */
+};
+
+/* Values for Instruction field above */
+
+enum acpi_einj_instructions {
+	ACPI_EINJ_READ_REGISTER = 0,
+	ACPI_EINJ_READ_REGISTER_VALUE = 1,
+	ACPI_EINJ_WRITE_REGISTER = 2,
+	ACPI_EINJ_WRITE_REGISTER_VALUE = 3,
+	ACPI_EINJ_NOOP = 4,
+	ACPI_EINJ_INSTRUCTION_RESERVED = 5	/* 5 and greater are reserved */
+};
+
+/* Command status return values */
+
+enum acpi_einj_command_status {
+	ACPI_EINJ_SUCCESS = 0,
+	ACPI_EINJ_FAILURE = 1,
+	ACPI_EINJ_INVALID_ACCESS = 2,
+	ACPI_EINJ_STATUS_RESERVED = 3	/* 3 and greater are reserved */
+};
+
+/* EINJ Trigger Error Action Table */
+
+struct acpi_einj_trigger {
+	uint32_t header_size;
+	uint32_t revision;
+	uint32_t table_size;
+	uint32_t entry_count;
+};
+
+/* Subtable header for WHEA tables (EINJ, ERST, WDAT) */
+
+struct acpi_whea_header {
+	uint8_t action;
+	uint8_t instruction;
+	uint8_t flags;
+	uint8_t reserved;
+	struct acpi_generic_address register_region;
+	uint64_t value;		/* Value used with Read/Write register */
+	uint64_t mask;		/* Bitmask required for this register instruction */
+};
+
 #endif /* ACPI_H_ */
