@@ -18,6 +18,3 @@
 [0004]              Asl Compiler Revision : 20100528
 
 [0008]             ACPI Table Address   0 : 0000000000000010
-[0008]             ACPI Table Address   0 : 0000000000000020
-[0008]             ACPI Table Address   0 : 0000000000000030
-[0008]             ACPI Table Address   0 : 0000000000000040
