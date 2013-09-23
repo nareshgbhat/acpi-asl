@@ -125,6 +125,22 @@ static uint64_t obtain_esb(char *homedir, char *manifest_name)
 	return 0;
 }
 
+static int bfapei_expand_buf(char **buf, int *size, int reqr_size)
+{
+	if (*size >= reqr_size)
+		return BFAPEI_OK;
+
+	*buf = realloc(*buf, reqr_size);
+	if (!(*buf)) {
+		printf("Error during memory allocation!\n");
+		return BFAPEI_FAIL;
+	}
+	memset(*buf + *size, 0, reqr_size - *size);
+	*size = reqr_size;
+
+	return BFAPEI_OK;
+}
+
 static int bfapei_hest(char **buf, int *size, uint64_t paddr, int status)
 {
 	struct acpi_hest_generic_status *block_ptr;
@@ -136,15 +152,8 @@ static int bfapei_hest(char **buf, int *size, uint64_t paddr, int status)
 			sizeof(struct acpi_hest_generic_data) +
 			sizeof (struct cper_sec_mem_err);
 
-	if (*size < reqr_size) {
-		*buf = realloc(*buf, *size + reqr_size);
-		if (!(*buf)) {
-			printf("Error during memory allocation!\n");
-			return BFAPEI_FAIL;
-		}
-		memset(*buf + *size, 0, reqr_size - *size);
-		*size += reqr_size;
-	}
+	if (bfapei_expand_buf(buf, size, reqr_size))
+		return BFAPEI_FAIL;
 
 	/*
 	 * Fill in blob which will be parsed by GHES driver.
@@ -175,17 +184,10 @@ static int bfapei_hest(char **buf, int *size, uint64_t paddr, int status)
 
 static int bfapei_erst(char **buf, int *size, uint64_t paddr)
 {
-	int reqr_size = 0x400;
+	int reqr_size = 0x200;
 
-	if (*size < reqr_size) {
-		*buf = realloc(*buf, *size + reqr_size);
-		if (!(*buf)) {
-			printf("Error during memory allocation!\n");
-			return BFAPEI_FAIL;
-		}
-		memset(*buf + *size, 0, reqr_size - *size);
-		*size += reqr_size;
-	}
+	if (bfapei_expand_buf(buf, size, reqr_size))
+		return BFAPEI_FAIL;
 
 	/*
 	 * Fill in ERST registers.
