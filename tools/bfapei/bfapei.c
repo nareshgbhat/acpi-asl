@@ -198,7 +198,8 @@ static int bfapei_einj(char **buf, int *size, uint64_t paddr)
 		return BFAPEI_FAIL;
 
 	/* Available error type: Memory Correctable */
-	WRITE_EINJ_REG(*buf, ACPI_EINJ_GET_ERROR_TYPE, 0x00000008);
+	WRITE_EINJ_REG(*buf, ACPI_EINJ_GET_ERROR_TYPE,
+		       1 << ACPI_ERR_TYPE_MEM_CORRECTABLE);
 
 	WRITE_EINJ_REG(*buf, ACPI_EINJ_GET_COMMAND_STATUS, ACPI_EINJ_SUCCESS);
 	WRITE_EINJ_REG(*buf, ACPI_EINJ_CHECK_BUSY_STATUS, 1);
@@ -207,8 +208,10 @@ static int bfapei_einj(char **buf, int *size, uint64_t paddr)
 	 * Nothing to do more than just set status flag for previous prepared
 	 * ESB (error status block)
 	 */
-	WRITE_EINJ_REG(*buf, ACPI_EINJ_GET_TRIGGER_TABLE, paddr + 0x280);
-	trigger_tab = (struct acpi_einj_trigger *) (*buf + 0x280);
+	WRITE_EINJ_REG(*buf, ACPI_EINJ_GET_TRIGGER_TABLE,
+		       paddr + ACPI_EINJ_TRIGGER_TABLE_OFFSET);
+	trigger_tab = (struct acpi_einj_trigger *)
+		(*buf + ACPI_EINJ_TRIGGER_TABLE_OFFSET);
 	trigger_tab->header_size = sizeof(struct acpi_einj_trigger);
 	trigger_tab->table_size = sizeof(struct acpi_einj_trigger) +
 	    sizeof(struct acpi_whea_header);
@@ -229,8 +232,8 @@ static int bfapei_einj(char **buf, int *size, uint64_t paddr)
 	trigger_entry->register_region.address =
 		paddr + ((char *)&(block_ptr->block_status) - *buf);
 
-	trigger_entry->value = 1;
-	trigger_entry->mask = 0xFFFFFFFFFFFFFFFFUL;
+	trigger_entry->value = 1 << GHES_ERR_TYPE_CORRECTABLE;
+	trigger_entry->mask = ~0x0UL;
 
 	return BFAPEI_OK;
 }
