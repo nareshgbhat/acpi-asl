@@ -240,6 +240,74 @@ DefinitionBlock (
 			}
 		}
 
+		Device (PMU0) {
+			Name (_HID, "LINA0007")
+			Name (_UID, 0)
+
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {92, 93, 94, 95}
+				})
+				Return (RBUF)
+			}
+		}
+
+		Device (SMB) {
+			Name (_HID, "ACPI0004")
+			Name (_UID, 0)
+
+			Name (_CRS, ResourceTemplate () {
+
+			DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+			0x00000000,         // Address Space Granularity
+			0x08000000,         // Address Range Minimum   (base address in FDT)
+			0x0BFFFFFF,         // Address Range Maximum   (base + (len-1))
+			0x00000000,         // Address Translation Offset
+			0x04000000,         // Address Length           (len in FDT)
+			,, , AddressRangeMemory, TypeStatic)
+
+			DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+			0x00000000,         // Address Space Granularity
+			0x14000000,         // Address Range Minimum   (base address in FDT)
+			0x17FFFFFF,         // Address Range Maximum   (base + (len-1))
+			0x00000000,         // Address Translation Offset
+			0x04000000,         // Address Length           (len in FDT)
+			,, , AddressRangeMemory, TypeStatic)
+
+			DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+			0x00000000,         // Address Space Granularity
+			0x18000000,         // Address Range Minimum   (base address in FDT)
+			0x1BFFFFFF,         // Address Range Maximum   (base + (len-1))
+			0x00000000,         // Address Translation Offset
+			0x04000000,         // Address Length           (len in FDT)
+			,, , AddressRangeMemory, TypeStatic)
+
+			DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+			0x00000000,         // Address Space Granularity
+			0x1C000000,         // Address Range Minimum   (base address in FDT)
+			0x1FFFFFFF,         // Address Range Maximum   (base + (len -1))
+			0x00000000,         // Address Translation Offset
+			0x04000000,         // Address Length           (len in FDT)
+			,, , AddressRangeMemory, TypeStatic)
+
+			DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+			0x00000000,         // Address Space Granularity
+			0x0C000000,         // Address Range Minimum   (base address in FDT)
+			0x0FFFFFFF,         // Address Range Maximum   (base + (len-1))
+			0x00000000,         // Address Translation Offset
+			0x04000000,         // Address Length           (len in FDT)
+			,, , AddressRangeMemory, TypeStatic)
+
+			DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+			0x00000000,         // Address Space Granularity
+			0x10000000,         // Address Range Minimum   (base address in FDT)
+			0x13FFFFFF,         // Address Range Maximum   (base + (len-1))
+			0x00000000,         // Address Translation Offset
+			0x04000000,         // Address Length           (len in FDT)
+			,, , AddressRangeMemory, TypeStatic)
+
+			})
+
 		Device (NET0) {
 			Name (_HID, "LINA0003")
 			Name (_UID, 0)
@@ -250,6 +318,60 @@ DefinitionBlock (
 					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x2F}
 				})
 				Return (RBUF)
+			}
+		}
+
+		Device (CLK0) {
+			Name (_HID, "LINA0008")
+			Name (_UID, 0)
+
+			Method (FREQ, 0x0, NotSerialized) {
+				Return (24000000)
+			}
+		}
+
+		Device (CLK1) {
+			Name (_HID, "LINA0008")
+			Name (_UID, 1)
+
+			Method (FREQ, 0x0, NotSerialized) {
+				Return (1000000)
+			}
+		}
+
+		Device (CLK2) {
+			Name (_HID, "LINA0008")
+			Name (_UID, 2)
+
+			Method (FREQ, 0x0, NotSerialized) {
+				Return (32768)
+			}
+		}
+
+		Device (FPGA) {
+			Name (_HID, "ACPI0004")
+			Name (_UID, 0)
+
+			Name (_CRS, ResourceTemplate () {
+
+			DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+			0x00000000,         // Address Space Granularity
+			0x1C000000,         // Address Range Minimum   (base address in FDT)
+			0x1C1FFFFF,         // Address Range Maximum   (base + (len-1))
+			0x00000000,         // Address Translation Offset
+			0x00200000,         // Address Length           (len in FDT)
+			,, , AddressRangeMemory, TypeStatic)
+			})
+
+		Device (SREG) {
+			Name (_HID, "LINA0009")
+			Name (_UID, 0)
+
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate() {
+					Memory32Fixed (ReadWrite, 0x1c010000, 0x1000)
+			})
+			Return (RBUF)
 			}
 		}
 
@@ -265,17 +387,64 @@ DefinitionBlock (
 				Return (RBUF)
 			}
 		}
+	} // End of FPGA
+	} // End SMB
 
-		Device (PMU0) {
-			Name (_HID, "LINA0007")
-			Name (_UID, 0)
+	Device (AMBA) {
+		Name (_HID, "AMBA0000")
+		Name (_UID, 0)
+
+		Device (SER0) {
+			Name (_ADR, 0x1c090000)
+                        Name (_UID, 0)
 
 			Method (_CRS, 0x0, Serialized) {
-				Name (RBUF, ResourceTemplate () {
-					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {92, 93, 94, 95}
+				Name (RBUF, ResourceTemplate() {
+					Memory32Fixed (ReadWrite, 0x1c090000, 0x1000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x25}
 				})
-				Return (RBUF)
+			Return (RBUF)
 			}
 		}
+
+		Device (SER1) {
+			Name (_ADR, 0x1c0a0000)
+			Name (_UID, 1)
+
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate() {
+					Memory32Fixed (ReadWrite, 0x1c0a0000, 0x1000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x26}
+				})
+			Return (RBUF)
+			}
+		}
+
+		Device (SER2) {
+			Name (_ADR, 0x1c0b0000)
+			Name (_UID, 2)
+
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate() {
+					Memory32Fixed (ReadWrite, 0x1c0b0000, 0x1000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x27}
+				})
+			Return (RBUF)
+			}
+		}
+
+		Device (SER3) {
+			Name (_ADR, 0x1c0c0000)
+			Name (_UID, 3)
+
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate() {
+					Memory32Fixed (ReadWrite, 0x1c0c0000, 0x1000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x28}
+			})
+			Return (RBUF)
+			}
+		}
+	} // End of AMBA
 	}
 }
