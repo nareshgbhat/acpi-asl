@@ -42,6 +42,8 @@
 #define ACPI_OEM_ID_SIZE	6
 #define ACPI_OEM_TABLE_ID_SIZE	8
 
+#pragma pack(1)
+
 /* Generic ACPI table header */
 
 struct acpi_table_header {
@@ -301,5 +303,8 @@ struct acpi_whea_header {
 	uint64_t value;		/* Value used with Read/Write register */
 	uint64_t mask;		/* Bitmask required for this register instruction */
 };
+
+/* Reset to default packing */
+#pragma pack()
 
 #endif /* ACPI_H_ */
