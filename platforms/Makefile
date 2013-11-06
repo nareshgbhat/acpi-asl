@@ -34,7 +34,7 @@ ifdef PADDR
 endif
 
 %.acpi : FORCE
-	$(MAB) -d $@ $(PADDR_ARG) -i $(basename $@).manifest -o $@
+	$(MAB) -H -d $@ $(PADDR_ARG) -i $(basename $@).manifest -o $@
 ifdef APEI
 	$(BFAPEI) -d $@ -i $(basename $@).manifest -t $(APEI) -o apei.acpi
 endif
