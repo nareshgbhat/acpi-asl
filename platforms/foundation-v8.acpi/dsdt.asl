@@ -390,9 +390,56 @@ DefinitionBlock (
 	} // End of FPGA
 	} // End SMB
 
+	Method (DTGP, 5, NotSerialized)
+	{
+		If (LEqual (Arg0, Buffer (0x10)
+		{
+		/* UUID:        a706b112-bf0b-48d2-9fa3-95591a3c4c06 */
+		/* 0000 */    0xa7, 0x06, 0xb1, 0x12, 0xbf, 0x0b, 0x48, 0xd2,
+		/* 0008 */    0x9f, 0xa3, 0x95, 0x59, 0x1a, 0x3c, 0x4c, 0x06
+		}))
+		{
+		If (LEqual (Arg1, 0x01)) {
+			If (LEqual (Arg2, 0x00)) {
+				Store (Buffer (0x01)
+				{
+				0x03
+				}, Arg4)
+				Return (0x01)
+			}
+
+			If (LEqual (Arg2, 0x01)) {
+				Return (0x01)
+			}
+		}
+		}
+
+		Store (Buffer (0x01)
+		{
+			0x00
+		}, Arg4)
+
+		Return (0x00)
+	}
+
+
 	Device (AMBA) {
 		Name (_HID, "AMBA0000")
 		Name (_UID, 0)
+
+		/* Define 'apb_pclk' as a default clock source since it is
+			common with devices below */
+
+		Method(_DSM, 4, NotSerialized) {
+			Store (Package (2)
+			{
+				"clock-name", "apb_pclk \\_SB.SMB.CLK0",
+				}, Local0)
+
+				DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+				Return (Local0)
+		}
 
 		Device (SER0) {
 			Name (_HID, "LINA000A")
