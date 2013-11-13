@@ -1,3 +1,6 @@
+0.28.1 -- 2013-11-11
+	-- Change to BSD license
+
 0.28.1 -- 2013-07-19
 	-- Bug fix: Makefile needs to rebuild if .h changes
 	-- Bug fix: Makefile needs to actually use CFLAGS
