@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013, Al Stone <al.stone@linaro.org>
+ *                     Hanjun Guo <hanjun.guo@linaro.org>
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -48,22 +49,32 @@
 [0004]              Flags (decoded below) : 00000001
                            Memory Present : 1
 
-[0004]               Secure PL1 Interrupt : 00000000
-[0004]         SPL1 Flags (decoded below) : 00000000
-                             Trigger Mode : 0
+/* In Foundation model's dts file, the last cell of interrupts
+ * is 0xff01, it means its cpu mask is FF, and trigger type
+ * and flag is 1 = low-to-high edge triggered.
+ * 
+ * so in ACPI the Trigger Mode is 1 - Edge triggered, and 
+ * Polarity is 0 - Active high as ACPI spec describled.
+ *
+ * using direct mapping for hwirqs, it means that we using
+ * ID [16, 31] for PPI, not [0, 15] used in FDT.
+ */
+[0004]               Secure PL1 Interrupt : 0000001d
+[0004]         SPL1 Flags (decoded below) : 00000001
+                             Trigger Mode : 1
                                  Polarity : 0
 
-[0004]           Non-Secure PL1 Interrupt : 00000000
-[0004]        NSPL1 Flags (decoded below) : 00000000
-                             Trigger Mode : 0
+[0004]           Non-Secure PL1 Interrupt : 0000001e
+[0004]        NSPL1 Flags (decoded below) : 00000001
+                             Trigger Mode : 1
                                  Polarity : 0
 
-[0004]            Virtual Timer Interrupt : 00000000
-[0004]           VT Flags (decoded below) : 00000000
-                             Trigger Mode : 0
+[0004]            Virtual Timer Interrupt : 0000001b
+[0004]           VT Flags (decoded below) : 00000001
+                             Trigger Mode : 1
                                  Polarity : 0
 
-[0004]           Non-Secure PL2 Interrupt : 00000000
-[0004]        NSPL2 Flags (decoded below) : 00000000
-                             Trigger Mode : 0
+[0004]           Non-Secure PL2 Interrupt : 0000001a
+[0004]        NSPL2 Flags (decoded below) : 00000001
+                             Trigger Mode : 1
                                  Polarity : 0
