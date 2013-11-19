@@ -476,7 +476,7 @@ DefinitionBlock (
 			Method (_CRS, 0x0, Serialized) {
 				Name (RBUF, ResourceTemplate() {
 					Memory32Fixed (ReadWrite, 0x1c090000, 0x1000)
-					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x25}
+					Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive, , , ) {0x25}
 				})
 			Return (RBUF)
 			}
@@ -490,7 +490,7 @@ DefinitionBlock (
 			Method (_CRS, 0x0, Serialized) {
 				Name (RBUF, ResourceTemplate() {
 					Memory32Fixed (ReadWrite, 0x1c0a0000, 0x1000)
-					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x26}
+					Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive, , , ) {0x26}
 				})
 			Return (RBUF)
 			}
@@ -504,7 +504,7 @@ DefinitionBlock (
 			Method (_CRS, 0x0, Serialized) {
 				Name (RBUF, ResourceTemplate() {
 					Memory32Fixed (ReadWrite, 0x1c0b0000, 0x1000)
-					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x27}
+					Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive, , , ) {0x27}
 				})
 			Return (RBUF)
 			}
@@ -518,7 +518,7 @@ DefinitionBlock (
 			Method (_CRS, 0x0, Serialized) {
 				Name (RBUF, ResourceTemplate() {
 					Memory32Fixed (ReadWrite, 0x1c0c0000, 0x1000)
-					Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x28}
+					Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive, , , ) {0x28}
 			})
 			Return (RBUF)
 			}
