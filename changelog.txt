@@ -1,0 +1,9 @@
+----------------------------------------
+19 November 2013. Summary of changes:
+
+1) ACPI structures alignment to 1 byte
+
+ACPI structures are taken directly from Linux tree. They are all wrap inside
+#pragma pack(1) just to be sure 1 byte alignment requirements are satisfied.
+
+----------------------------------------
