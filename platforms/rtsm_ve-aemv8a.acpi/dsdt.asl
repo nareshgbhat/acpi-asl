@@ -267,7 +267,7 @@ DefinitionBlock (
 		}
 
 		Device (NET0) {
-			Name (_HID, "LINA0003")
+			Name (_HID, "LNRO0003")
 			Name (_UID, 0)
 
 			Method (_CRS, 0x0, Serialized) {
@@ -280,7 +280,7 @@ DefinitionBlock (
 		}
 
 		Device (PMU0) {
-			Name (_HID, "LINA0007")
+			Name (_HID, "LNRO0007")
 			Name (_UID, 0)
 
 			Method (_CRS, 0x0, Serialized) {

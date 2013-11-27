@@ -47,7 +47,7 @@ DefinitionBlock (
 		}
 
 		Device (I2C) {
-			Name (_HID, "LINA0001")
+			Name (_HID, "LNRO0001")
 			Name (_UID, 0)
 
 			Method (_CRS, 0x0, Serialized) {

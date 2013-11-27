@@ -268,7 +268,7 @@ DefinitionBlock (
 		}
 
 		Device (PMU0) {
-			Name (_HID, "LINA0007")
+			Name (_HID, "LNRO0007")
 			Name (_UID, 0)
 
 			Method (_CRS, 0x0, Serialized) {
@@ -336,7 +336,7 @@ DefinitionBlock (
 			})
 
 		Device (NET0) {
-			Name (_HID, "LINA0003")
+			Name (_HID, "LNRO0003")
 			Name (_UID, 0)
 
 			Method (_CRS, 0x0, Serialized) {
@@ -349,7 +349,7 @@ DefinitionBlock (
 		}
 
 		Device (CLK0) {
-			Name (_HID, "LINA0008")
+			Name (_HID, "LNRO0008")
 			Name (_UID, 0)
 
 			Method (FREQ, 0x0, NotSerialized) {
@@ -358,7 +358,7 @@ DefinitionBlock (
 		}
 
 		Device (CLK1) {
-			Name (_HID, "LINA0008")
+			Name (_HID, "LNRO0008")
 			Name (_UID, 1)
 
 			Method (FREQ, 0x0, NotSerialized) {
@@ -367,7 +367,7 @@ DefinitionBlock (
 		}
 
 		Device (CLK2) {
-			Name (_HID, "LINA0008")
+			Name (_HID, "LNRO0008")
 			Name (_UID, 2)
 
 			Method (FREQ, 0x0, NotSerialized) {
@@ -391,7 +391,7 @@ DefinitionBlock (
 			})
 
 		Device (SREG) {
-			Name (_HID, "LINA0009")
+			Name (_HID, "LNRO0009")
 			Name (_UID, 0)
 
 			Method (_CRS, 0x0, Serialized) {
@@ -403,7 +403,7 @@ DefinitionBlock (
 		}
 
 		Device (VIRT) {
-			Name (_HID, "LINA0005")
+			Name (_HID, "LNRO0005")
 			Name (_UID, 0)
 
 			Method (_CRS, 0x0, Serialized) {
