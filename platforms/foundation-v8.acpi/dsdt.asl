@@ -469,7 +469,7 @@ DefinitionBlock (
 		}
 
 		Device (SER0) {
-			Name (_HID, "LINA000A")
+			Name (_HID, "LNRO000A")
 			Name (_ADR, 0x1c090000)
                         Name (_UID, 0)
 
@@ -483,7 +483,7 @@ DefinitionBlock (
 		}
 
 		Device (SER1) {
-			Name (_HID, "LINA000A")
+			Name (_HID, "LNRO000A")
 			Name (_ADR, 0x1c0a0000)
 			Name (_UID, 1)
 
@@ -497,7 +497,7 @@ DefinitionBlock (
 		}
 
 		Device (SER2) {
-			Name (_HID, "LINA000A")
+			Name (_HID, "LNRO000A")
 			Name (_ADR, 0x1c0b0000)
 			Name (_UID, 2)
 
@@ -511,7 +511,7 @@ DefinitionBlock (
 		}
 
 		Device (SER3) {
-			Name (_HID, "LINA000A")
+			Name (_HID, "LNRO000A")
 			Name (_ADR, 0x1c0c0000)
 			Name (_UID, 3)
 
