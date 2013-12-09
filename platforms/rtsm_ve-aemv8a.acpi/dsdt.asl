@@ -266,6 +266,74 @@ DefinitionBlock (
 			}
 		}
 
+		Device (PMU0) {
+			Name (_HID, "LNRO0007")
+			Name (_UID, 0)
+
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive, , , ) {92, 93, 94, 95}
+				})
+				Return (RBUF)
+			}
+		}
+
+                Device (SMB) {
+                        Name (_HID, "ACPI0004")
+                        Name (_UID, 0)
+
+                        Name (_CRS, ResourceTemplate () {
+
+                        DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+                        0x00000000,         // Address Space Granularity
+                        0x08000000,         // Address Range Minimum   (base address in FDT)
+                        0x0BFFFFFF,         // Address Range Maximum   (base + (len-1))
+                        0x00000000,         // Address Translation Offset
+                        0x04000000,         // Address Length           (len in FDT)
+                        ,, , AddressRangeMemory, TypeStatic)
+
+                        DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+                        0x00000000,         // Address Space Granularity
+                        0x14000000,         // Address Range Minimum   (base address in FDT)
+                        0x17FFFFFF,         // Address Range Maximum   (base + (len-1))
+                        0x00000000,         // Address Translation Offset
+                        0x04000000,         // Address Length           (len in FDT)
+                        ,, , AddressRangeMemory, TypeStatic)
+
+                        DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+                        0x00000000,         // Address Space Granularity
+                        0x18000000,         // Address Range Minimum   (base address in FDT)
+                        0x1BFFFFFF,         // Address Range Maximum   (base + (len-1))
+                        0x00000000,         // Address Translation Offset
+                        0x04000000,         // Address Length           (len in FDT)
+                        ,, , AddressRangeMemory, TypeStatic)
+
+                        DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+                        0x00000000,         // Address Space Granularity
+                        0x1C000000,         // Address Range Minimum   (base address in FDT)
+                        0x1FFFFFFF,         // Address Range Maximum   (base + (len -1))
+                        0x00000000,         // Address Translation Offset
+                        0x04000000,         // Address Length           (len in FDT)
+                        ,, , AddressRangeMemory, TypeStatic)
+
+                        DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+                        0x00000000,         // Address Space Granularity
+                        0x0C000000,         // Address Range Minimum   (base address in FDT)
+                        0x0FFFFFFF,         // Address Range Maximum   (base + (len-1))
+                        0x00000000,         // Address Translation Offset
+                        0x04000000,         // Address Length           (len in FDT)
+                        ,, , AddressRangeMemory, TypeStatic)
+
+                        DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+                        0x00000000,         // Address Space Granularity
+                        0x10000000,         // Address Range Minimum   (base address in FDT)
+                        0x13FFFFFF,         // Address Range Maximum   (base + (len-1))
+                        0x00000000,         // Address Translation Offset
+                        0x04000000,         // Address Length           (len in FDT)
+                        ,, , AddressRangeMemory, TypeStatic)
+
+                        })
+
 		Device (NET0) {
 			Name (_HID, "LNRO0003")
 			Name (_UID, 0)
@@ -279,16 +347,358 @@ DefinitionBlock (
 			}
 		}
 
-		Device (PMU0) {
-			Name (_HID, "LNRO0007")
-			Name (_UID, 0)
+                Device (CLK0) {
+                        Name (_HID, "LNRO0008")
+                        Name (_UID, 0)
 
+                        Method (FREQ, 0x0, NotSerialized) {
+                                Return (24000000)
+                        }
+                }
+
+                Device (CLK1) {
+                        Name (_HID, "LNRO0008")
+                        Name (_UID, 1)
+
+                        Method (FREQ, 0x0, NotSerialized) {
+                                Return (1000000)
+                        }
+                }
+
+                Device (CLK2) {
+                        Name (_HID, "LNRO0008")
+                        Name (_UID, 2)
+
+                        Method (FREQ, 0x0, NotSerialized) {
+                                Return (32768)
+                        }
+                }
+
+                Device (FPGA) {
+                        Name (_HID, "ACPI0004")
+                        Name (_UID, 0)
+
+                        Name (_CRS, ResourceTemplate () {
+
+                        DWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+                        0x00000000,         // Address Space Granularity
+                        0x1C000000,         // Address Range Minimum   (base address in FDT)
+                        0x1C1FFFFF,         // Address Range Maximum   (base + (len-1))
+                        0x00000000,         // Address Translation Offset
+                        0x00200000,         // Address Length           (len in FDT)
+                        ,, , AddressRangeMemory, TypeStatic)
+                        })
+
+                Device (VIRT) {
+                        Name (_HID, "LNRO0005")
+                        Name (_UID, 0)
+
+                        Method (_CRS, 0x0, Serialized) {
+                                Name (RBUF, ResourceTemplate() {
+                                        Memory32Fixed (ReadWrite, 0x1c130000, 0x1000)
+                                        Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive, , , ) {0x4A}
+                                })
+                                Return (RBUF)
+                        }
+                }
+        } // End of FPGA
+        } // End SMB
+
+        Method (DTGP, 5, NotSerialized)
+        {
+                If (LEqual (Arg0, Buffer (0x10)
+                {
+                /* UUID:        a706b112-bf0b-48d2-9fa3-95591a3c4c06 */
+                /* 0000 */    0xa7, 0x06, 0xb1, 0x12, 0xbf, 0x0b, 0x48, 0xd2,
+                /* 0008 */    0x9f, 0xa3, 0x95, 0x59, 0x1a, 0x3c, 0x4c, 0x06
+                }))
+                {
+                If (LEqual (Arg1, 0x01)) {
+                        If (LEqual (Arg2, 0x00)) {
+                                Store (Buffer (0x01)
+                                {
+                                0x03
+                                }, Arg4)
+                                Return (0x01)
+                        }
+
+                        If (LEqual (Arg2, 0x01)) {
+                                Return (0x01)
+                        }
+                }
+                }
+
+                Store (Buffer (0x01)
+                {
+                        0x00
+                }, Arg4)
+
+                Return (0x00)
+        }
+
+        Device (AMBA) {
+                Name (_HID, "AMBA0000")
+                Name (_UID, 0)
+
+                /* Define 'apb_pclk' as a default clock source since it is
+                        common with devices below */
+
+                Method(_DSM, 4, NotSerialized) {
+                        Store (Package (2)
+                        {
+                                "clock-name", "apb_pclk \\_SB.SMB.CLK0",
+                                }, Local0)
+
+                                DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+                                Return (Local0)
+                }
+
+		Device (SCT0) {
+                        Name (_HID, "LNRO000C")
+                        Name (_UID, 0)
+			Name (_ADR, 0x1c020000)						/* SYSCTL */
 			Method (_CRS, 0x0, Serialized) {
 				Name (RBUF, ResourceTemplate () {
-					Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive, , , ) {92, 93, 94, 95}
+					Memory32Fixed (ReadWrite, 0x1c020000, 0x00001000)
+				})
+				Return (RBUF)
+			}
+			Method(_DSM, 4, Serialized) {
+				Store (Package (4)
+				{
+					"clock-name", "refclk \\_SB.SMB.CLK2",
+					"clock-name", "timclk \\_SB.SMB.CLK1",
+				}, Local0)
+
+				DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+				Return (Local0)
+			}
+		}
+
+		Device (AAC0) {
+                        Name (_HID, "LNRO000D")
+                        Name (_UID, 0)
+			Name (_ADR, 0x1c040000)						/* AACI */
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c040000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {43}
 				})
 				Return (RBUF)
 			}
 		}
+
+		Device (MMC0) {
+			Name (_HID, "LNRO000E")
+			Name (_UID, 0)
+			Name (_ADR, 0x1c050000)						/* MMCI */
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c050000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {41, 42}
+				})
+				Return (RBUF)
+			}
+			Method(_DSM, 4, Serialized) {
+				Store (Package (2)
+				{
+					"clock-name", "MCLK \\_SB.SMB.CLK0",
+				}, Local0)
+
+				DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+				Return (Local0)
+			}
+		}
+
+		Device (KMI0) {
+                        Name (_HID, "LNRO000F")
+                        Name (_UID, 0)
+			Name (_ADR, 0x1c060000)
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c060000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {44}
+				})
+				Return (RBUF)
+			}
+			Method(_DSM, 4, Serialized) {
+				Store (Package (2)
+				{
+					"clock-name", "KMIREFCLK \\_SB.SMB.CLK0",
+				}, Local0)
+
+				DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+				Return (Local0)
+			}
+		}
+
+		Device (KMI1) {
+                        Name (_HID, "LNRO000F")
+                        Name (_UID, 1)
+			Name (_ADR, 0x1c070000)
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c070000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {45}
+				})
+				Return (RBUF)
+			}
+			Method(_DSM, 4, NotSerialized) {
+				Store (Package (2)
+				{
+					"clock-name", "KMIREFCLK \\_SB.SMB.CLK0",
+				}, Local0)
+
+				DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+				Return (Local0)
+			}
+		}
+
+                Device (SER0) {
+                        Name (_HID, "LNRO000A")
+                        Name (_ADR, 0x1c090000)
+                        Name (_UID, 0)
+
+                        Method (_CRS, 0x0, Serialized) {
+                                Name (RBUF, ResourceTemplate() {
+                                        Memory32Fixed (ReadWrite, 0x1c090000, 0x1000)
+                                        Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x25}
+                                })
+                        Return (RBUF)
+                        }
+                }
+
+                Device (SER1) {
+                        Name (_HID, "LNRO000A")
+                        Name (_ADR, 0x1c0a0000)
+                        Name (_UID, 1)
+
+                        Method (_CRS, 0x0, Serialized) {
+                                Name (RBUF, ResourceTemplate() {
+                                        Memory32Fixed (ReadWrite, 0x1c0a0000, 0x1000)
+                                        Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x26}
+                                })
+                        Return (RBUF)
+                        }
+                }
+
+                Device (SER2) {
+                        Name (_HID, "LNRO000A")
+                        Name (_ADR, 0x1c0b0000)
+                        Name (_UID, 2)
+
+                        Method (_CRS, 0x0, Serialized) {
+                                Name (RBUF, ResourceTemplate() {
+                                        Memory32Fixed (ReadWrite, 0x1c0b0000, 0x1000)
+                                        Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x27}
+                                })
+                        Return (RBUF)
+                        }
+                }
+
+                Device (SER3) {
+                        Name (_HID, "LNRO000A")
+                        Name (_ADR, 0x1c0c0000)
+                        Name (_UID, 3)
+
+                        Method (_CRS, 0x0, Serialized) {
+                                Name (RBUF, ResourceTemplate() {
+                                        Memory32Fixed (ReadWrite, 0x1c0c0000, 0x1000)
+                                        Interrupt (ResourceConsumer, Edge, ActiveBoth, Exclusive, , , ) {0x28}
+                        })
+                        Return (RBUF)
+                        }
+                }
+
+		Device (WDT0) {
+                        Name (_HID, "LNRO0011")
+                        Name (_UID, 0)
+			Name (_ADR, 0x1c0f0000)						/* WDT */
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c0f0000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {32}
+				})
+				Return (RBUF)
+			}
+		}
+
+		Device (TIM0) {
+                        Name (_HID, "LNRO0012")
+                        Name (_UID, 0)
+			Name (_ADR, 0x1c110000)						/* TIMER01 */
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c110000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {34}
+				})
+				Return (RBUF)
+			}
+		}
+
+		Device (TIM2) {
+                        Name (_HID, "LNRO0012")
+                        Name (_UID, 1)
+			Name (_ADR, 0x1c120000)						/* TIMER23 */
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c120000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {35}
+				})
+				Return (RBUF)
+			}
+		}
+
+		Device (RTC0) {
+                        Name (_HID, "LNRO0013")
+                        Name (_UID, 0)
+			Name (_ADR, 0x1c170000)						/* RTC */
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c170000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {36}
+				})
+				Return (RBUF)
+			}
+		}
+
+		Device (CLCD) {
+                        Name (_HID, "LNRO0014")
+                        Name (_UID, 0)
+			Name (_ADR, 0x1c1f0000)						/* CLCD */
+			Method (_CRS, 0x0, Serialized) {
+				Name (RBUF, ResourceTemplate () {
+					Memory32Fixed (ReadWrite, 0x1c1f0000, 0x00001000)
+					Interrupt (ResourceConsumer, Edge, ActiveBoth,
+							Exclusive, , , ) {46}
+				})
+				Return (RBUF)
+			}
+			Method(_DSM, 4, Serialized) {
+				Store (Package (2)
+				{
+					"clock-name", "CCLDCLK \\_SB.SMB.CLK0",
+				}, Local0)
+
+				DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+				Return (Local0)
+			}
+		}
+
+        } // End of AMBA
 	}
 }
