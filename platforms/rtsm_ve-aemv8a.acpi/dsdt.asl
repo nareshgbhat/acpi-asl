@@ -436,6 +436,25 @@ DefinitionBlock (
                 Return (0x00)
         }
 
+	Device (REG0) {
+		Name (_HID, "LNRO0019")
+		Name (_UID, 0)
+
+		Method(_DSM, 4, NotSerialized) {
+			Store (Package (8)
+			{
+                        "regulator-name", "3V3",
+                        "regulator-min-microvolt", "3300000",
+                        "regulator-max-microvolt", "3300000",
+                        "regulator-always-on", "1",
+			}, Local0)
+
+			DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+			Return (Local0)
+		}
+	}
+
         Device (AMBA) {
                 Name (_HID, "AMBA0000")
                 Name (_UID, 0)
