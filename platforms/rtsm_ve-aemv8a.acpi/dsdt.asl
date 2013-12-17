@@ -389,6 +389,18 @@ DefinitionBlock (
                         ,, , AddressRangeMemory, TypeStatic)
                         })
 
+                Device (SREG) {
+                        Name (_HID, "LNRO0009")
+                        Name (_UID, 0)
+
+                        Method (_CRS, 0x0, Serialized) {
+                                Name (RBUF, ResourceTemplate() {
+                                        Memory32Fixed (ReadWrite, 0x1c010000, 0x1000)
+                        })
+                        Return (RBUF)
+                        }
+                }
+
                 Device (VIRT) {
                         Name (_HID, "LNRO0005")
                         Name (_UID, 0)
