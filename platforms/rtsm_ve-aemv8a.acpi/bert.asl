@@ -45,4 +45,4 @@
 [0004]              Asl Compiler Revision : 20100528
 
 [0004]           Boot Error Region Length : 0x9D
-[0008]          Boot Error Region Address : 0xFFFF0008
+[0008]          Boot Error Region Address : 0x81e00008
