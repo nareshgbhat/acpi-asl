@@ -127,10 +127,10 @@ struct acpi_hest_generic {
 };
 
 enum {
-	GHES_SEV_NO = 0x0,
-	GHES_SEV_CORRECTED = 0x1,
-	GHES_SEV_RECOVERABLE = 0x2,
-	GHES_SEV_PANIC = 0x3,
+	CPER_SEV_RECOVERABLE,
+	CPER_SEV_FATAL,
+	CPER_SEV_CORRECTED,
+	CPER_SEV_INFORMATIONAL,
 };
 
 /* Generic Error Status block */
@@ -213,7 +213,11 @@ struct cper_sec_mem_err {
 	uint64_t	responder_id;
 	uint64_t	target_id;
 	uint8_t		error_type;
-} __attribute__ ((packed));
+	uint8_t		reserved;
+	uint16_t	rank;
+	uint16_t	mem_array_handle;	/* card handle in UEFI 2.4 */
+	uint16_t	mem_dev_handle;		/* module handle in UEFI 2.4 */
+};
 
 /* ERST Error Log Address Range atrributes */
 #define ERST_RANGE_RESERVED	0x0001

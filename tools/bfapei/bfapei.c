@@ -195,7 +195,7 @@ static int bfapei_hest(char **buf, int *size, uint64_t paddr, int status)
 	block_ptr = (struct acpi_hest_generic_status *) (++add_ptr);
 	block_ptr->block_status = status;
 	block_ptr->data_length = sizeof(struct acpi_hest_generic_data);
-	block_ptr->error_severity = GHES_SEV_CORRECTED;
+	block_ptr->error_severity = CPER_SEV_CORRECTED;
 
 	/* Fill in generic error data entry */
 	gdata = (struct acpi_hest_generic_data *) (block_ptr + 1);
