@@ -206,6 +206,24 @@ static int bfapei_hest(char **buf, int *size, uint64_t paddr, int status)
 
 	mem_err = (struct cper_sec_mem_err *) (gdata + 1);
 	/* Place for more specific err info */
+	mem_err->validation_bits |= CPER_MEM_VALID_ERROR_TYPE;
+	mem_err->error_type = 2;
+
+	mem_err->validation_bits |= CPER_MEM_VALID_PHYSICAL_ADDRESS;
+	mem_err->physical_addr = ~0UL;
+
+	mem_err->validation_bits |= CPER_MEM_VALID_CARD | CPER_MEM_VALID_MODULE |
+			CPER_MEM_VALID_BANK | CPER_MEM_VALID_ROW |
+			CPER_MEM_VALID_COLUMN | CPER_MEM_VALID_BIT_POSITION;
+	mem_err->card = 1;
+	mem_err->module = 2;
+	mem_err->bank = 3;
+	mem_err->row = 1;
+	mem_err->column = 2;
+	mem_err->bit_pos = 5;
+
+	mem_err->validation_bits |= CPER_MEM_VALID_ERROR_STATUS;
+	mem_err->error_status = 4 << 8;
 
 	return BFAPEI_OK;
 }
