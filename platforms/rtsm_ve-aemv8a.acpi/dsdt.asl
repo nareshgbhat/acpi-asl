@@ -467,6 +467,29 @@ DefinitionBlock (
 		}
 	}
 
+	Device (FLH0) {
+		Name (_HID, "LNRO0015")
+		Name (_UID, 0)
+		Method (_CRS, 0x0, Serialized) {
+			Name (RBUF, ResourceTemplate () {
+				Memory32Fixed (ReadWrite, 0x08000000, 0x04000000)
+				Memory32Fixed (ReadWrite, 0x0C000000, 0x04000000)
+			})
+			Return (RBUF)
+		}
+
+		Method(_DSM, 4, NotSerialized) {
+			Store (Package ()
+			{
+				"bank-width", "4",
+			}, Local0)
+
+			DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+
+			Return (Local0)
+		}
+	}
+
         Device (AMBA) {
                 Name (_HID, "AMBA0000")
                 Name (_UID, 0)
