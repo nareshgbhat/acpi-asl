@@ -65,6 +65,8 @@ char *known_sigs[] = {
 	"ssdt",
 	"uefi",
 	"xsdt",
+	"dbg2",
+	"spcr",
 	NULL
 };
 
