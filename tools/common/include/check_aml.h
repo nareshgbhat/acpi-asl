@@ -90,6 +90,7 @@
 #define SIG_SSDT	"SSDT"
 #define SIG_UEFI	"UEFI"
 #define SIG_XSDT	"XSDT"
+#define SIG_DBG2        "DBG2"
 
 struct known_table_info {
 	char *signature;		/* table signature */
