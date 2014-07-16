@@ -28,7 +28,7 @@
  * 
  * NB: This License is also known as the "BSD 2-Clause License".
  * 
- * 
+ *
  * [FACP] ACPI Table
  *
  */
@@ -38,7 +38,7 @@
 [0001]                           Revision : 05
 [0001]                           Checksum : 18
 [0006]                             Oem ID : "LINARO"
-[0008]                       Oem Table ID : "FOUNDATI"
+[0008]                       Oem Table ID : "RTSMVEV8"
 [0004]                       Oem Revision : 00000000
 [0004]                    Asl Compiler ID : "INTL"
 [0004]              Asl Compiler Revision : 20111123
@@ -118,7 +118,10 @@
 [0008]                            Address : 0000000000000001
 
 [0001]               Value to cause reset : 00
-[0003]                           Reserved : 000000
+[0002]      ARM_BOOT_ARCH (decoded below) : 0001
+                            Use PSCI 0.2+ : 1
+                             PSCI Use HVC : 0
+[0001]                FADT Minor Revision : 01
 [0008]                       FACS Address : 0000000000000000
 [0008]                       DSDT Address : 0000000000000010
 [0012]                   PM1A Event Block : [Generic Address Structure]
