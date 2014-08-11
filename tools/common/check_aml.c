@@ -70,6 +70,7 @@ struct known_table_info known_info[] = {
 	{ SIG_UEFI, 1 },
 	{ SIG_XSDT, 1 },
 	{ SIG_DBG2, 1 },
+	{ SIG_SPCR, 1 },
 	{ NULL, 0 }
 };
 
