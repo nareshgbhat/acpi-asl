@@ -64,3 +64,4 @@
 [0008]             ACPI Table Address   0 : 0000000000000120
 [0008]             ACPI Table Address   0 : 0000000000000130
 [0008]             ACPI Table Address   0 : 0000000000000140
+[0008]             ACPI Table Address   0 : 0000000000000150
